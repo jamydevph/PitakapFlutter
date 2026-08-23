@@ -95,3 +95,15 @@ DateTime _nextMonthly(DateTime anchor, DateTime start, int monthsPerCycle) {
 
   return candidate;
 }
+
+DateTime startOfMonth(DateTime value) {
+  return DateTime(value.year, value.month);
+}
+
+DateTime startOfNextMonth(DateTime value) {
+  return DateTime(value.year, value.month + 1);
+}
+
+bool isSameMonth(DateTime a, DateTime b) {
+  return a.year == b.year && a.month == b.month;
+}

@@ -13,6 +13,7 @@ import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_us
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/entities/subscription_entity.dart';
 import 'package:pitakapflutter/feature/subscription/domain/repository/subscription_repository.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/create_subscription_usecase.dart';
@@ -53,6 +54,13 @@ class StubExpenseRepository implements ExpenseRepository {
     WatchExpensesForDayParams params,
   ) {
     return Stream.value(items);
+  }
+
+  @override
+  Stream<List<ExpenseEntity>> watchExpensesForMonth(
+    WatchExpensesForMonthParams params,
+  ) {
+    return Stream.value(const []);
   }
 
   @override
