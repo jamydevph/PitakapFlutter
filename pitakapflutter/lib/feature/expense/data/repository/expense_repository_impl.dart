@@ -5,6 +5,7 @@ import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_us
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
 
 class ExpenseRepositoryImpl implements ExpenseRepository {
   final ExpenseRemoteDatasource remote;
@@ -16,6 +17,13 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
     WatchExpensesForDayParams params,
   ) {
     return remote.watchExpensesForDay(params);
+  }
+
+  @override
+  Stream<List<ExpenseEntity>> watchExpensesForMonth(
+    WatchExpensesForMonthParams params,
+  ) {
+    return remote.watchExpensesForMonth(params);
   }
 
   @override

@@ -3,10 +3,15 @@ import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_us
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
 
 abstract interface class ExpenseRepository {
   Stream<List<ExpenseEntity>> watchExpensesForDay(
     WatchExpensesForDayParams params,
+  );
+
+  Stream<List<ExpenseEntity>> watchExpensesForMonth(
+    WatchExpensesForMonthParams params,
   );
 
   Future<void> createExpense(CreateExpenseUseCaseParams params);

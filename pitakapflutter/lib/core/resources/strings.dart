@@ -159,6 +159,18 @@ class Strings {
   static const String expenseCreated = 'Expense added';
   static const String expenseUpdated = 'Expense updated';
   static const String statsTitle = 'Statistics';
+  static const String statsThisMonthCaption = 'this month';
+  static const String statsPerMonthCaption = 'per month';
+  static const String statsPerYearCaption = 'per year';
+  static const String statsPreviousMonth = 'Previous month';
+  static const String statsNextMonth = 'Next month';
+  static const String statsEmptyExpensesTitle = 'Nothing logged this month';
+  static const String statsEmptyExpensesMessage =
+      'Log an expense and the breakdown will appear here.';
+  static const String statsEmptySubscriptionsTitle = 'No active subscriptions';
+  static const String statsEmptySubscriptionsMessage =
+      'Add a subscription to see what your recurring spend looks like.';
+  static const String statsLoadFailed = 'Could not load your statistics';
   static const String settingsTitle = 'Settings';
 
   static const String emailRequired = 'Email is required';

@@ -12,6 +12,7 @@ import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_us
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
 import 'package:pitakapflutter/feature/expense/presentation/providers/selected_day_controller.dart';
 
 import 'helpers.dart';
@@ -46,6 +47,13 @@ class FakeExpenseRepository implements ExpenseRepository {
     });
 
     return controller.stream;
+  }
+
+  @override
+  Stream<List<ExpenseEntity>> watchExpensesForMonth(
+    WatchExpensesForMonthParams params,
+  ) {
+    return Stream.value(const []);
   }
 
   @override

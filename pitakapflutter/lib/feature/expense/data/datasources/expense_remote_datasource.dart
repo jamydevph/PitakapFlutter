@@ -6,10 +6,15 @@ import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_us
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
 
 abstract interface class ExpenseRemoteDatasource {
   Stream<List<ExpenseModel>> watchExpensesForDay(
     WatchExpensesForDayParams params,
+  );
+
+  Stream<List<ExpenseModel>> watchExpensesForMonth(
+    WatchExpensesForMonthParams params,
   );
 
   Future<void> createExpense(CreateExpenseUseCaseParams params);
@@ -35,6 +40,22 @@ class ExpenseRemoteDatasourceImpl implements ExpenseRemoteDatasource {
     return _collection
         .where(Keys.userId, isEqualTo: params.userId)
         .where(Keys.date, isEqualTo: Timestamp.fromDate(params.day))
+        .snapshots()
+        .map(_toSortedModels)
+        .handleError((Object error) => throw FirestoreErrorMapper.from(error));
+  }
+
+  @override
+  Stream<List<ExpenseModel>> watchExpensesForMonth(
+    WatchExpensesForMonthParams params,
+  ) {
+    return _collection
+        .where(Keys.userId, isEqualTo: params.userId)
+        .where(
+          Keys.date,
+          isGreaterThanOrEqualTo: Timestamp.fromDate(params.month),
+        )
+        .where(Keys.date, isLessThan: Timestamp.fromDate(params.nextMonth))
         .snapshots()
         .map(_toSortedModels)
         .handleError((Object error) => throw FirestoreErrorMapper.from(error));
