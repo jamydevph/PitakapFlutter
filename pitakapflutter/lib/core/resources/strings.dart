@@ -185,6 +185,15 @@ class Strings {
   static const String amountRequired = 'Amount is required';
   static const String amountInvalid = 'Enter a valid amount';
 
+  static const String reminderInitFailed = 'Could not set up reminders';
+  static const String reminderPermissionFailed =
+      'Could not ask for notification permission';
+  static const String reminderScheduleFailed = 'Could not schedule the reminder';
+  static const String reminderCancelFailed = 'Could not cancel the reminder';
+  static const String reminderPendingFailed =
+      'Could not read scheduled reminders';
+  static const String reminderTitle = 'Payment due soon';
+
   static const String genericError = 'Something went wrong. Please try again.';
   static const String networkError = 'No internet connection';
 }
