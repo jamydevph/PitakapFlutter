@@ -1,5 +1,7 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pitakapflutter/core/providers/auth_providers.dart';
+import 'package:pitakapflutter/feature/subscription/data/datasources/reminder_local_datasource.dart';
 import 'package:pitakapflutter/feature/subscription/data/datasources/subscription_remote_datasource.dart';
 import 'package:pitakapflutter/feature/subscription/data/repository/subscription_repository_impl.dart';
 import 'package:pitakapflutter/feature/subscription/domain/entities/subscription_entity.dart';
@@ -15,6 +17,16 @@ final subscriptionRemoteDatasourceProvider =
         firestore: ref.watch(firestoreProvider),
       ),
     );
+
+final localNotificationsPluginProvider = Provider<FlutterLocalNotificationsPlugin>(
+  (ref) => FlutterLocalNotificationsPlugin(),
+);
+
+final reminderLocalDatasourceProvider = Provider<ReminderLocalDatasource>(
+  (ref) => ReminderLocalDatasourceImpl(
+    ref.watch(localNotificationsPluginProvider),
+  ),
+);
 
 final subscriptionRepositoryProvider = Provider<SubscriptionRepository>(
   (ref) =>
