@@ -7,6 +7,7 @@ import 'package:pitakapflutter/core/providers/app_providers.dart';
 import 'package:pitakapflutter/core/providers/settings_providers.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_router.dart';
+import 'package:pitakapflutter/core/router/reminder_bootstrap.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/firebase_options.dart';
 
@@ -33,13 +34,15 @@ class PitakapApp extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
 
-    return MaterialApp.router(
-      title: Strings.appName,
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: themeMode,
-      routerConfig: router,
+    return ReminderBootstrap(
+      child: MaterialApp.router(
+        title: Strings.appName,
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
+        themeMode: themeMode,
+        routerConfig: router,
+      ),
     );
   }
 }

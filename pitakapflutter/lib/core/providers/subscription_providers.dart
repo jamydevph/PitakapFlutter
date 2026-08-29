@@ -8,6 +8,8 @@ import 'package:pitakapflutter/feature/subscription/domain/entities/subscription
 import 'package:pitakapflutter/feature/subscription/domain/repository/subscription_repository.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/create_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/delete_subscription_usecase.dart';
+import 'package:pitakapflutter/feature/subscription/domain/usecases/reschedule_all_reminders_usecase.dart';
+import 'package:pitakapflutter/feature/subscription/domain/usecases/restore_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/update_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/watch_subscriptions_usecase.dart';
 
@@ -29,8 +31,10 @@ final reminderLocalDatasourceProvider = Provider<ReminderLocalDatasource>(
 );
 
 final subscriptionRepositoryProvider = Provider<SubscriptionRepository>(
-  (ref) =>
-      SubscriptionRepositoryImpl(ref.watch(subscriptionRemoteDatasourceProvider)),
+  (ref) => SubscriptionRepositoryImpl(
+    ref.watch(subscriptionRemoteDatasourceProvider),
+    ref.watch(reminderLocalDatasourceProvider),
+  ),
 );
 
 final watchSubscriptionsUseCaseProvider = Provider<WatchSubscriptionsUseCase>(
@@ -48,6 +52,16 @@ final updateSubscriptionUseCaseProvider = Provider<UpdateSubscriptionUseCase>(
 final deleteSubscriptionUseCaseProvider = Provider<DeleteSubscriptionUseCase>(
   (ref) => DeleteSubscriptionUseCase(ref.watch(subscriptionRepositoryProvider)),
 );
+
+final restoreSubscriptionUseCaseProvider = Provider<RestoreSubscriptionUseCase>(
+  (ref) => RestoreSubscriptionUseCase(ref.watch(subscriptionRepositoryProvider)),
+);
+
+final rescheduleAllRemindersUseCaseProvider =
+    Provider<RescheduleAllRemindersUseCase>(
+      (ref) =>
+          RescheduleAllRemindersUseCase(ref.watch(subscriptionRepositoryProvider)),
+    );
 
 final subscriptionsStreamProvider =
     StreamProvider.family<List<SubscriptionEntity>, String>(

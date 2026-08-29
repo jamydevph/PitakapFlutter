@@ -193,6 +193,11 @@ class Strings {
   static const String reminderPendingFailed =
       'Could not read scheduled reminders';
   static const String reminderTitle = 'Payment due soon';
+  static const String reminderRenewsToday = 'renews today';
+  static const String reminderRenewsTomorrow = 'renews tomorrow';
+  static const String reminderRenewsIn = 'renews in';
+  static const String reminderDaysSuffix = 'days';
+  static const String reminderRestoreFailed = 'Could not restore that item';
 
   static const String genericError = 'Something went wrong. Please try again.';
   static const String networkError = 'No internet connection';

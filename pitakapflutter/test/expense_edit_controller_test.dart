@@ -9,6 +9,7 @@ import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.da
 import 'package:pitakapflutter/feature/expense/domain/repository/expense_repository.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/restore_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
@@ -54,6 +55,9 @@ class GatedExpenseRepository implements ExpenseRepository {
 
   @override
   Future<void> deleteExpense(DeleteExpenseUseCaseParams params) async {}
+
+  @override
+  Future<void> restoreExpense(RestoreExpenseUseCaseParams params) async {}
 }
 
 ProviderContainer containerWith(GatedExpenseRepository repository) {

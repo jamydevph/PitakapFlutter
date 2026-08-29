@@ -9,8 +9,8 @@ import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/feature/subscription/domain/entities/subscription_entity.dart';
-import 'package:pitakapflutter/feature/subscription/domain/usecases/create_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/delete_subscription_usecase.dart';
+import 'package:pitakapflutter/feature/subscription/domain/usecases/restore_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/providers/subscription_list_filter.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/providers/subscription_list_filter_controller.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/widgets/subscription_filter_bar.dart';
@@ -45,31 +45,25 @@ class SubscriptionsListPage extends ConsumerWidget {
           content: Text('${subscription.name} ${Strings.subscriptionDeleted}'),
           action: SnackBarAction(
             label: Strings.undoAction,
-            onPressed: () => _restore(ref, subscription),
+            onPressed: () => _restore(context, ref, subscription),
           ),
         ),
       );
   }
 
-  void _restore(WidgetRef ref, SubscriptionEntity subscription) {
-    ref
-        .read(createSubscriptionUseCaseProvider)
-        .call(
-          CreateSubscriptionUseCaseParams(
-            userId: subscription.userId,
-            name: subscription.name,
-            category: subscription.category,
-            amount: subscription.amount,
-            firstBillDate: subscription.firstBillDate,
-            billingCycle: subscription.billingCycle,
-            currency: subscription.currency,
-            reminderDaysBefore: subscription.reminderDaysBefore,
-            colorHex: subscription.colorHex,
-            iconKey: subscription.iconKey,
-            notes: subscription.notes,
-            isActive: subscription.isActive,
-          ),
-        );
+  Future<void> _restore(
+    BuildContext context,
+    WidgetRef ref,
+    SubscriptionEntity subscription,
+  ) async {
+    try {
+      await ref
+          .read(restoreSubscriptionUseCaseProvider)
+          .call(RestoreSubscriptionUseCaseParams(subscription));
+    } catch (error) {
+      if (!context.mounted) return;
+      CommonSnackBar.showError(context, failureMessage(error));
+    }
   }
 
   @override

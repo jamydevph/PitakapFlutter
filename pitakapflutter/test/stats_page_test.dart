@@ -9,6 +9,7 @@ import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.da
 import 'package:pitakapflutter/feature/expense/domain/repository/expense_repository.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/restore_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
@@ -17,6 +18,7 @@ import 'package:pitakapflutter/feature/subscription/domain/entities/subscription
 import 'package:pitakapflutter/feature/subscription/domain/repository/subscription_repository.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/create_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/delete_subscription_usecase.dart';
+import 'package:pitakapflutter/feature/subscription/domain/usecases/restore_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/update_subscription_usecase.dart';
 
 import 'helpers.dart';
@@ -53,6 +55,9 @@ class MonthExpenseRepository implements ExpenseRepository {
 
   @override
   Future<void> deleteExpense(DeleteExpenseUseCaseParams params) async {}
+
+  @override
+  Future<void> restoreExpense(RestoreExpenseUseCaseParams params) async {}
 }
 
 class StubSubscriptionRepository implements SubscriptionRepository {
@@ -73,6 +78,12 @@ class StubSubscriptionRepository implements SubscriptionRepository {
 
   @override
   Future<void> deleteSubscription(DeleteSubscriptionUseCaseParams p) async {}
+
+  @override
+  Future<void> restoreSubscription(RestoreSubscriptionUseCaseParams p) async {}
+
+  @override
+  Future<void> rescheduleAllReminders(String userId) async {}
 }
 
 ExpenseEntity expense({
