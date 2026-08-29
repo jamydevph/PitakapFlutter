@@ -66,6 +66,15 @@ class ExpenseModel extends ExpenseEntity {
     Keys.updatedAt: FieldValue.serverTimestamp(),
   };
 
+  Map<String, dynamic> toRestoreMap() => {
+    Keys.userId: userId,
+    ..._writableFields,
+    Keys.createdAt: createdAt == null
+        ? FieldValue.serverTimestamp()
+        : Timestamp.fromDate(createdAt!),
+    Keys.updatedAt: FieldValue.serverTimestamp(),
+  };
+
   Map<String, dynamic> get _writableFields => {
     Keys.description: description,
     Keys.category: category,

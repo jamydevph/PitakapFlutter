@@ -1,3 +1,4 @@
+import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/utils/billing_date_utils.dart';
 import 'package:pitakapflutter/feature/subscription/domain/entities/subscription_entity.dart';
 
@@ -13,6 +14,15 @@ int reminderIdFor(String subscriptionId) {
   }
 
   return hash;
+}
+
+String reminderBodyFor({required String name, required int daysBefore}) {
+  if (daysBefore <= 0) return '$name ${Strings.reminderRenewsToday}';
+
+  if (daysBefore == 1) return '$name ${Strings.reminderRenewsTomorrow}';
+
+  return '$name ${Strings.reminderRenewsIn} $daysBefore '
+      '${Strings.reminderDaysSuffix}';
 }
 
 DateTime reminderTimeFor({

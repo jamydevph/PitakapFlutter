@@ -5,6 +5,8 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 abstract interface class ReminderLocalDatasource {
+  set onReminderTap(void Function(String subscriptionId)? handler);
+
   Future<void> initialize();
 
   Future<bool> requestPermission();
@@ -37,6 +39,21 @@ class ReminderLocalDatasourceImpl implements ReminderLocalDatasource {
 
   bool _ready = false;
 
+  void Function(String subscriptionId)? _onReminderTap;
+
+  @override
+  set onReminderTap(void Function(String subscriptionId)? handler) {
+    _onReminderTap = handler;
+  }
+
+  void handleResponse(NotificationResponse response) {
+    final payload = response.payload;
+
+    if (payload == null || payload.isEmpty) return;
+
+    _onReminderTap?.call(payload);
+  }
+
   AndroidFlutterLocalNotificationsPlugin? get _android =>
       plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin
@@ -55,6 +72,7 @@ class ReminderLocalDatasourceImpl implements ReminderLocalDatasource {
           android: AndroidInitializationSettings(androidIcon),
           iOS: DarwinInitializationSettings(),
         ),
+        onDidReceiveNotificationResponse: handleResponse,
       );
 
       _ready = true;

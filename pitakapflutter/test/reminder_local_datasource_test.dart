@@ -236,6 +236,67 @@ void main() {
     });
   });
 
+  group('onReminderTap', () {
+    test('⭐ a tap reports the payload as the subscription id', () {
+      final tapped = <String>[];
+      datasource.onReminderTap = tapped.add;
+
+      datasource.handleResponse(
+        const NotificationResponse(
+          notificationResponseType:
+              NotificationResponseType.selectedNotification,
+          payload: 'sub-42',
+        ),
+      );
+
+      expect(tapped, ['sub-42']);
+    });
+
+    test('⭐ a null payload is ignored, never routed as an empty id', () {
+      final tapped = <String>[];
+      datasource.onReminderTap = tapped.add;
+
+      datasource.handleResponse(
+        const NotificationResponse(
+          notificationResponseType:
+              NotificationResponseType.selectedNotification,
+        ),
+      );
+
+      expect(tapped, isEmpty);
+    });
+
+    test('an empty payload is ignored too', () {
+      final tapped = <String>[];
+      datasource.onReminderTap = tapped.add;
+
+      datasource.handleResponse(
+        const NotificationResponse(
+          notificationResponseType:
+              NotificationResponseType.selectedNotification,
+          payload: '',
+        ),
+      );
+
+      expect(tapped, isEmpty);
+    });
+
+    test('⭐ a tap with no handler attached does not throw', () {
+      datasource.onReminderTap = null;
+
+      expect(
+        () => datasource.handleResponse(
+          const NotificationResponse(
+            notificationResponseType:
+                NotificationResponseType.selectedNotification,
+            payload: 'sub-42',
+          ),
+        ),
+        returnsNormally,
+      );
+    });
+  });
+
   group('pendingReminderIds', () {
     test('returns just the ids', () async {
       when(() => plugin.pendingNotificationRequests()).thenAnswer(

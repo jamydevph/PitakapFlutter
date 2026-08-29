@@ -10,6 +10,7 @@ import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.da
 import 'package:pitakapflutter/feature/expense/domain/repository/expense_repository.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/restore_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
@@ -23,6 +24,7 @@ class FakeExpenseRepository implements ExpenseRepository {
 
   final List<String> deleted = [];
   final List<CreateExpenseUseCaseParams> created = [];
+  final List<ExpenseEntity> restored = [];
 
   final Map<DateTime, StreamController<List<ExpenseEntity>>> _controllers = {};
 
@@ -63,6 +65,16 @@ class FakeExpenseRepository implements ExpenseRepository {
 
   @override
   Future<void> updateExpense(UpdateExpenseUseCaseParams params) async {}
+
+  @override
+  Future<void> restoreExpense(RestoreExpenseUseCaseParams params) async {
+    restored.add(params.expense);
+
+    final day = startOfDay(params.expense.date);
+    _byDay.putIfAbsent(day, () => []).add(params.expense);
+
+    _controllers[day]?.add(List.of(_byDay[day] ?? const []));
+  }
 
   @override
   Future<void> deleteExpense(DeleteExpenseUseCaseParams params) async {
@@ -263,7 +275,7 @@ void main() {
       expect(find.text('Undo'), findsOneWidget);
     });
 
-    testWidgets('undo re-creates the expense with its original fields', (
+    testWidgets('⭐ undo restores the same document, it does not re-create', (
       tester,
     ) async {
       sizeViewport(tester);
@@ -293,9 +305,11 @@ void main() {
       await tester.tap(find.text('Undo'));
       await tester.pumpAndSettle();
 
-      expect(repository.created, hasLength(1));
+      expect(repository.restored, hasLength(1));
+      expect(repository.created, isEmpty);
 
-      final restored = repository.created.single;
+      final restored = repository.restored.single;
+      expect(restored.id, 'e1');
       expect(restored.description, 'Milk tea');
       expect(restored.amount, 160);
       expect(restored.paymentMethod, 'gcash');

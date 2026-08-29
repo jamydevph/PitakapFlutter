@@ -10,8 +10,8 @@ import 'package:pitakapflutter/core/router/app_routes.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/core/utils/billing_date_utils.dart';
 import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.dart';
-import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/restore_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
 import 'package:pitakapflutter/feature/expense/presentation/providers/selected_day_controller.dart';
 import 'package:pitakapflutter/feature/expense/presentation/widgets/expense_date_strip.dart';
@@ -68,26 +68,25 @@ class ExpensesPage extends ConsumerWidget {
           content: const Text(Strings.expenseDeleted),
           action: SnackBarAction(
             label: Strings.undoAction,
-            onPressed: () => _restore(ref, expense),
+            onPressed: () => _restore(context, ref, expense),
           ),
         ),
       );
   }
 
-  void _restore(WidgetRef ref, ExpenseEntity expense) {
-    ref
-        .read(createExpenseUseCaseProvider)
-        .call(
-          CreateExpenseUseCaseParams(
-            userId: expense.userId,
-            description: expense.description,
-            category: expense.category,
-            amount: expense.amount,
-            date: expense.date,
-            currency: expense.currency,
-            paymentMethod: expense.paymentMethod,
-          ),
-        );
+  Future<void> _restore(
+    BuildContext context,
+    WidgetRef ref,
+    ExpenseEntity expense,
+  ) async {
+    try {
+      await ref
+          .read(restoreExpenseUseCaseProvider)
+          .call(RestoreExpenseUseCaseParams(expense));
+    } catch (error) {
+      if (!context.mounted) return;
+      CommonSnackBar.showError(context, failureMessage(error));
+    }
   }
 
   @override
