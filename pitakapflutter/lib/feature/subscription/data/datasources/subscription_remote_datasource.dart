@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pitakapflutter/core/error/firestore_error_mapper.dart';
 import 'package:pitakapflutter/core/resources/keys.dart';
 import 'package:pitakapflutter/feature/subscription/data/model/subscription_model.dart';
+import 'package:pitakapflutter/feature/subscription/domain/entities/subscription_entity.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/create_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/delete_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/update_subscription_usecase.dart';
@@ -9,11 +10,13 @@ import 'package:pitakapflutter/feature/subscription/domain/usecases/update_subsc
 abstract interface class SubscriptionRemoteDatasource {
   Stream<List<SubscriptionModel>> watchSubscriptions(String userId);
 
-  Future<void> createSubscription(CreateSubscriptionUseCaseParams params);
+  Future<String> createSubscription(CreateSubscriptionUseCaseParams params);
 
   Future<void> updateSubscription(UpdateSubscriptionUseCaseParams params);
 
   Future<void> deleteSubscription(DeleteSubscriptionUseCaseParams params);
+
+  Future<void> restoreSubscription(SubscriptionEntity subscription);
 }
 
 class SubscriptionRemoteDatasourceImpl implements SubscriptionRemoteDatasource {
@@ -35,7 +38,9 @@ class SubscriptionRemoteDatasourceImpl implements SubscriptionRemoteDatasource {
   }
 
   @override
-  Future<void> createSubscription(CreateSubscriptionUseCaseParams params) async {
+  Future<String> createSubscription(
+    CreateSubscriptionUseCaseParams params,
+  ) async {
     try {
       final model = SubscriptionModel(
         id: '',
@@ -53,7 +58,20 @@ class SubscriptionRemoteDatasourceImpl implements SubscriptionRemoteDatasource {
         isActive: params.isActive,
       );
 
-      await _collection.add(model.toCreateMap());
+      final document = await _collection.add(model.toCreateMap());
+
+      return document.id;
+    } catch (error) {
+      throw FirestoreErrorMapper.from(error);
+    }
+  }
+
+  @override
+  Future<void> restoreSubscription(SubscriptionEntity subscription) async {
+    try {
+      final model = SubscriptionModel.fromEntity(subscription);
+
+      await _collection.doc(model.id).set(model.toRestoreMap());
     } catch (error) {
       throw FirestoreErrorMapper.from(error);
     }

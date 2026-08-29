@@ -56,6 +56,43 @@ void main() {
     });
   });
 
+  group('reminderBodyFor', () {
+    test('reads naturally for a multi-day lead time', () {
+      expect(
+        reminderBodyFor(name: 'Netflix', daysBefore: 3),
+        'Netflix renews in 3 days',
+      );
+    });
+
+    test('⭐ one day before says tomorrow, never "in 1 days"', () {
+      expect(
+        reminderBodyFor(name: 'Netflix', daysBefore: 1),
+        'Netflix renews tomorrow',
+      );
+    });
+
+    test('⭐ same-day says today, never "in 0 days"', () {
+      expect(
+        reminderBodyFor(name: 'Netflix', daysBefore: 0),
+        'Netflix renews today',
+      );
+    });
+
+    test('a negative lead time still reads as today', () {
+      expect(
+        reminderBodyFor(name: 'Netflix', daysBefore: -2),
+        'Netflix renews today',
+      );
+    });
+
+    test('the subscription name is used verbatim', () {
+      expect(
+        reminderBodyFor(name: 'HBO Max / Sky', daysBefore: 5),
+        'HBO Max / Sky renews in 5 days',
+      );
+    });
+  });
+
   group('reminderTimeFor', () {
     test('lands the requested number of days before, at the reminder hour', () {
       final fireAt = reminderTimeFor(

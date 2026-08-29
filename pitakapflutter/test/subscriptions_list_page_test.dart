@@ -10,6 +10,7 @@ import 'package:pitakapflutter/feature/subscription/domain/entities/subscription
 import 'package:pitakapflutter/feature/subscription/domain/repository/subscription_repository.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/create_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/delete_subscription_usecase.dart';
+import 'package:pitakapflutter/feature/subscription/domain/usecases/restore_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/widgets/subscription_tile.dart';
 
 import 'helpers.dart';
@@ -53,12 +54,14 @@ void main() {
         firstBillDate: DateTime(2026),
       ),
     );
+    registerFallbackValue(RestoreSubscriptionUseCaseParams(sub()));
   });
 
   setUp(() {
     repository = MockSubscriptionRepository();
     when(() => repository.deleteSubscription(any())).thenAnswer((_) async {});
     when(() => repository.createSubscription(any())).thenAnswer((_) async {});
+    when(() => repository.restoreSubscription(any())).thenAnswer((_) async {});
   });
 
   Future<void> pumpList(
@@ -151,7 +154,7 @@ void main() {
       expect(find.text(Strings.undoAction), findsOneWidget);
     });
 
-    testWidgets('undo recreates the subscription with the same values', (
+    testWidgets('⭐ undo restores the same document id, it does not re-create', (
       tester,
     ) async {
       await pumpList(tester, [sub(id: 'a', name: 'Netflix', amount: 549)]);
@@ -166,12 +169,33 @@ void main() {
       await tester.pumpAndSettle();
 
       final captured = verify(
-        () => repository.createSubscription(captureAny()),
-      ).captured.single as CreateSubscriptionUseCaseParams;
+        () => repository.restoreSubscription(captureAny()),
+      ).captured.single as RestoreSubscriptionUseCaseParams;
 
-      expect(captured.name, 'Netflix');
-      expect(captured.amount, 549);
-      expect(captured.userId, 'uid-1');
+      expect(captured.subscription.id, 'a');
+      expect(captured.subscription.name, 'Netflix');
+      expect(captured.subscription.amount, 549);
+      expect(captured.subscription.userId, 'uid-1');
+
+      verifyNever(() => repository.createSubscription(any()));
+    });
+
+    testWidgets('a failed undo reports the error', (tester) async {
+      when(() => repository.restoreSubscription(any()))
+          .thenThrow(const NetworkFailure('No internet connection'));
+
+      await pumpList(tester, [sub(id: 'a', name: 'Netflix')]);
+
+      await tester.drag(
+        find.byType(SubscriptionTile),
+        const Offset(-500, 0),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text(Strings.undoAction));
+      await tester.pumpAndSettle();
+
+      expect(find.text('No internet connection'), findsOneWidget);
     });
 
     testWidgets('a failed delete reports the error', (tester) async {

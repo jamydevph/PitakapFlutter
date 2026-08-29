@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pitakapflutter/core/error/firestore_error_mapper.dart';
 import 'package:pitakapflutter/core/resources/keys.dart';
 import 'package:pitakapflutter/feature/expense/data/model/expense_model.dart';
+import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
@@ -22,6 +23,8 @@ abstract interface class ExpenseRemoteDatasource {
   Future<void> updateExpense(UpdateExpenseUseCaseParams params);
 
   Future<void> deleteExpense(DeleteExpenseUseCaseParams params);
+
+  Future<void> restoreExpense(ExpenseEntity expense);
 }
 
 class ExpenseRemoteDatasourceImpl implements ExpenseRemoteDatasource {
@@ -87,6 +90,17 @@ class ExpenseRemoteDatasourceImpl implements ExpenseRemoteDatasource {
       final model = ExpenseModel.fromEntity(params.expense);
 
       await _collection.doc(model.id).update(model.toUpdateMap());
+    } catch (error) {
+      throw FirestoreErrorMapper.from(error);
+    }
+  }
+
+  @override
+  Future<void> restoreExpense(ExpenseEntity expense) async {
+    try {
+      final model = ExpenseModel.fromEntity(expense);
+
+      await _collection.doc(model.id).set(model.toRestoreMap());
     } catch (error) {
       throw FirestoreErrorMapper.from(error);
     }
