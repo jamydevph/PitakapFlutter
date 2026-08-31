@@ -38,4 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> signOut() => remote.signOut();
+
+  @override
+  Future<void> deleteAccount() => remote.deleteAccount();
 }

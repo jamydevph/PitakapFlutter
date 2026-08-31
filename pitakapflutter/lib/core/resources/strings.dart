@@ -173,6 +173,35 @@ class Strings {
   static const String statsLoadFailed = 'Could not load your statistics';
   static const String settingsTitle = 'Settings';
 
+  static const String settingsPreferencesSection = 'Preferences';
+  static const String settingsAccountSection = 'Account';
+  static const String settingsAboutSection = 'About';
+
+  static const String settingsCurrencyLabel = 'Default currency';
+  static const String settingsCurrencyHint =
+      'Used for new subscriptions and expenses';
+  static const String settingsReminderLabel = 'Default reminder';
+  static const String settingsReminderHint =
+      'How far ahead new subscriptions remind you';
+  static const String settingsThemeLabel = 'Appearance';
+  static const String settingsThemeSystem = 'System';
+  static const String settingsThemeLight = 'Light';
+  static const String settingsThemeDark = 'Dark';
+
+  static const String settingsAppNameLabel = 'Pitakap';
+  static const String settingsVersionLabel = 'Version';
+
+  static const String deleteAccountAction = 'Delete account';
+  static const String deleteAccountTitle = 'Delete your account?';
+  static const String deleteAccountMessage =
+      'This permanently removes your profile, every subscription and every '
+      'expense. It cannot be undone.';
+  static const String deleteAccountFailed = 'Could not delete your account';
+
+  static const String signOutTitle = 'Sign out?';
+  static const String signOutMessage =
+      'You will need to sign in again to see your subscriptions and expenses.';
+
   static const String emailRequired = 'Email is required';
   static const String emailInvalid = 'Enter a valid email';
   static const String passwordRequired = 'Password is required';

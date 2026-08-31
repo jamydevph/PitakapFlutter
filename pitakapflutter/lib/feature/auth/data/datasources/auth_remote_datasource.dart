@@ -25,6 +25,8 @@ abstract interface class AuthRemoteDatasource {
   Future<void> sendPasswordReset(SendPasswordResetUseCaseParams params);
 
   Future<void> signOut();
+
+  Future<void> deleteAccount();
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -181,5 +183,45 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     } catch (error) {
       throw AuthErrorMapper.from(error);
     }
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    try {
+      final user = auth.currentUser;
+
+      if (user == null) {
+        throw const UnknownFailure('No signed-in account to delete');
+      }
+
+      final uid = user.uid;
+
+      await _deleteOwnedDocuments(Keys.subscriptionsCollection, uid);
+      await _deleteOwnedDocuments(Keys.expensesCollection, uid);
+      await _userDoc(uid).delete();
+
+      await user.delete();
+
+      if (_googleReady) await googleSignIn.signOut();
+    } catch (error) {
+      throw AuthErrorMapper.from(error);
+    }
+  }
+
+  Future<void> _deleteOwnedDocuments(String collection, String uid) async {
+    final owned = await firestore
+        .collection(collection)
+        .where(Keys.userId, isEqualTo: uid)
+        .get();
+
+    if (owned.docs.isEmpty) return;
+
+    final batch = firestore.batch();
+
+    for (final document in owned.docs) {
+      batch.delete(document.reference);
+    }
+
+    await batch.commit();
   }
 }
