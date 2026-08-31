@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pitakapflutter/core/common/common.dart';
 import 'package:pitakapflutter/core/providers/auth_providers.dart';
+import 'package:pitakapflutter/core/providers/settings_providers.dart';
 import 'package:pitakapflutter/core/resources/constants.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
@@ -106,6 +107,7 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
           category: _category,
           amount: amount,
           date: _date,
+          currency: ref.read(defaultCurrencyProvider),
           paymentMethod: _paymentMethod,
         ),
       );
@@ -134,6 +136,8 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
     final editState = ref.watch(expenseEditControllerProvider).value;
     final isBusy = editState is ExpenseEditLoadingState;
     final userId = ref.watch(authStateProvider).value;
+    final String currencyCode =
+        widget.expense?.currency ?? ref.watch(defaultCurrencyProvider);
     final today = startOfDay(DateTime.now());
 
     ref.listen(expenseEditControllerProvider, (previous, next) {
@@ -197,6 +201,7 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
                     _AmountCard(
                       controller: _amountController,
                       enabled: !isBusy,
+                      currencyCode: currencyCode,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     _SectionLabel(Strings.expenseCategoryLabel),
@@ -262,8 +267,13 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
 class _AmountCard extends StatelessWidget {
   final TextEditingController controller;
   final bool enabled;
+  final String currencyCode;
 
-  const _AmountCard({required this.controller, required this.enabled});
+  const _AmountCard({
+    required this.controller,
+    required this.enabled,
+    required this.currencyCode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -288,7 +298,7 @@ class _AmountCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                currencySymbol(Constants.defaultCurrency),
+                currencySymbol(currencyCode),
                 style: theme.textTheme.headlineMedium?.copyWith(
                   color: colorScheme.primary,
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pitakapflutter/core/providers/app_providers.dart';
+import 'package:pitakapflutter/core/resources/constants.dart';
 import 'package:pitakapflutter/core/resources/keys.dart';
 
 class ThemeModeController extends Notifier<ThemeMode> {
@@ -40,3 +41,63 @@ class ThemeModeController extends Notifier<ThemeMode> {
 final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(
   ThemeModeController.new,
 );
+
+class DefaultCurrencyController extends Notifier<String> {
+  @override
+  String build() {
+    final stored = ref
+        .watch(sharedPreferencesProvider)
+        .getString(Keys.prefsDefaultCurrency);
+
+    if (stored == null || !Constants.currencies.contains(stored)) {
+      return Constants.defaultCurrency;
+    }
+
+    return stored;
+  }
+
+  Future<void> setCurrency(String code) async {
+    if (state == code || !Constants.currencies.contains(code)) return;
+
+    state = code;
+
+    await ref
+        .read(sharedPreferencesProvider)
+        .setString(Keys.prefsDefaultCurrency, code);
+  }
+}
+
+final defaultCurrencyProvider =
+    NotifierProvider<DefaultCurrencyController, String>(
+      DefaultCurrencyController.new,
+    );
+
+class DefaultReminderDaysController extends Notifier<int> {
+  @override
+  int build() {
+    final stored = ref
+        .watch(sharedPreferencesProvider)
+        .getInt(Keys.prefsDefaultReminderDays);
+
+    if (stored == null || !Constants.reminderDayOptions.contains(stored)) {
+      return Constants.defaultReminderDaysBefore;
+    }
+
+    return stored;
+  }
+
+  Future<void> setDays(int days) async {
+    if (state == days || !Constants.reminderDayOptions.contains(days)) return;
+
+    state = days;
+
+    await ref
+        .read(sharedPreferencesProvider)
+        .setInt(Keys.prefsDefaultReminderDays, days);
+  }
+}
+
+final defaultReminderDaysProvider =
+    NotifierProvider<DefaultReminderDaysController, int>(
+      DefaultReminderDaysController.new,
+    );

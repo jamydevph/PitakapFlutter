@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:pitakapflutter/core/common/common.dart';
 import 'package:pitakapflutter/core/providers/auth_providers.dart';
+import 'package:pitakapflutter/core/providers/settings_providers.dart';
 import 'package:pitakapflutter/core/resources/billing_cycle.dart';
 import 'package:pitakapflutter/core/resources/constants.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
@@ -64,7 +65,7 @@ class _SubscriptionEditPageState extends ConsumerState<SubscriptionEditPage> {
     _cycle = existing?.billingCycle ?? BillingCycle.monthly;
     _firstBillDate = existing?.firstBillDate ?? DateTime.now();
     _reminderDaysBefore =
-        existing?.reminderDaysBefore ?? Constants.defaultReminderDaysBefore;
+        existing?.reminderDaysBefore ?? ref.read(defaultReminderDaysProvider);
   }
 
   @override
@@ -113,6 +114,7 @@ class _SubscriptionEditPageState extends ConsumerState<SubscriptionEditPage> {
           amount: amount,
           firstBillDate: _firstBillDate,
           billingCycle: _cycle,
+          currency: ref.read(defaultCurrencyProvider),
           reminderDaysBefore: _reminderDaysBefore,
           notes: _notesController.text.trim(),
         ),
@@ -147,6 +149,8 @@ class _SubscriptionEditPageState extends ConsumerState<SubscriptionEditPage> {
     final editState = ref.watch(subscriptionEditControllerProvider).value;
     final isBusy = editState is SubscriptionEditLoadingState;
     final userId = ref.watch(authStateProvider).value;
+    final String currencyCode =
+        widget.subscription?.currency ?? ref.watch(defaultCurrencyProvider);
 
     ref.listen(subscriptionEditControllerProvider, (previous, next) {
       final state = next.value;
@@ -211,6 +215,7 @@ class _SubscriptionEditPageState extends ConsumerState<SubscriptionEditPage> {
                     _AmountCard(
                       controller: _amountController,
                       enabled: !isBusy,
+                      currencyCode: currencyCode,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     CommonTextField(
@@ -290,8 +295,13 @@ class _SubscriptionEditPageState extends ConsumerState<SubscriptionEditPage> {
 class _AmountCard extends StatelessWidget {
   final TextEditingController controller;
   final bool enabled;
+  final String currencyCode;
 
-  const _AmountCard({required this.controller, required this.enabled});
+  const _AmountCard({
+    required this.controller,
+    required this.enabled,
+    required this.currencyCode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -319,7 +329,7 @@ class _AmountCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                currencySymbol(Constants.defaultCurrency),
+                currencySymbol(currencyCode),
                 style: theme.textTheme.headlineMedium?.copyWith(
                   color: colorScheme.primary,
                 ),

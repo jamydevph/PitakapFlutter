@@ -17,4 +17,6 @@ abstract interface class AuthRepository {
   Future<void> sendPasswordReset(SendPasswordResetUseCaseParams params);
 
   Future<void> signOut();
+
+  Future<void> deleteAccount();
 }
