@@ -5,6 +5,20 @@ class Constants {
   static const String currencySymbol = '₱';
   static const int defaultReminderDaysBefore = 3;
 
+  static const String appVersion = '1.0.0';
+
+  static const List<String> currencies = [
+    'PHP',
+    'USD',
+    'EUR',
+    'GBP',
+    'JPY',
+    'SGD',
+    'AUD',
+  ];
+
+  static const List<int> reminderDayOptions = [0, 1, 3, 5, 7];
+
   static const Duration splashMinimumDuration = Duration(milliseconds: 1200);
 
   static const List<String> subscriptionCategories = [

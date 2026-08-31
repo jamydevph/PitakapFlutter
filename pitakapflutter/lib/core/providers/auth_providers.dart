@@ -6,6 +6,7 @@ import 'package:pitakapflutter/feature/auth/data/datasources/auth_remote_datasou
 import 'package:pitakapflutter/feature/auth/data/repository/auth_repository_impl.dart';
 import 'package:pitakapflutter/feature/auth/domain/entities/user_details_entity.dart';
 import 'package:pitakapflutter/feature/auth/domain/repository/auth_repository.dart';
+import 'package:pitakapflutter/feature/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:pitakapflutter/feature/auth/domain/usecases/login_user_usecase.dart';
 import 'package:pitakapflutter/feature/auth/domain/usecases/send_password_reset_usecase.dart';
 import 'package:pitakapflutter/feature/auth/domain/usecases/sign_in_with_google_usecase.dart';
@@ -72,4 +73,8 @@ final sendPasswordResetUseCaseProvider = Provider<SendPasswordResetUseCase>(
 
 final signOutUseCaseProvider = Provider<SignOutUseCase>(
   (ref) => SignOutUseCase(ref.watch(authRepositoryProvider)),
+);
+
+final deleteAccountUseCaseProvider = Provider<DeleteAccountUseCase>(
+  (ref) => DeleteAccountUseCase(ref.watch(authRepositoryProvider)),
 );

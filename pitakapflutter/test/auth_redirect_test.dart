@@ -89,7 +89,9 @@ void main() {
       expect(find.text(Strings.signOutAction), findsOneWidget);
     });
 
-    testWidgets('tapping it calls the repository', (tester) async {
+    testWidgets('⭐ it confirms first — one tap does not sign you out', (
+      tester,
+    ) async {
       final repository = MockAuthRepository();
       when(() => repository.signOut()).thenAnswer((_) async {});
 
@@ -100,7 +102,50 @@ void main() {
         repository: repository,
       );
 
-      await tester.tap(find.text(Strings.signOutAction));
+      await tester.tap(find.widgetWithText(ListTile, Strings.signOutAction));
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.signOutTitle), findsOneWidget);
+      verifyNever(() => repository.signOut());
+    });
+
+    testWidgets('cancelling the confirmation keeps you signed in', (
+      tester,
+    ) async {
+      final repository = MockAuthRepository();
+      when(() => repository.signOut()).thenAnswer((_) async {});
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.settings,
+        signedInUid: 'uid-1',
+        repository: repository,
+      );
+
+      await tester.tap(find.widgetWithText(ListTile, Strings.signOutAction));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(Strings.cancelAction));
+      await tester.pumpAndSettle();
+
+      verifyNever(() => repository.signOut());
+    });
+
+    testWidgets('confirming calls the repository', (tester) async {
+      final repository = MockAuthRepository();
+      when(() => repository.signOut()).thenAnswer((_) async {});
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.settings,
+        signedInUid: 'uid-1',
+        repository: repository,
+      );
+
+      await tester.tap(find.widgetWithText(ListTile, Strings.signOutAction));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(TextButton, Strings.signOutAction),
+      );
       await tester.pumpAndSettle();
 
       verify(() => repository.signOut()).called(1);
@@ -118,7 +163,11 @@ void main() {
         repository: repository,
       );
 
-      await tester.tap(find.text(Strings.signOutAction));
+      await tester.tap(find.widgetWithText(ListTile, Strings.signOutAction));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(TextButton, Strings.signOutAction),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('No internet connection'), findsOneWidget);
