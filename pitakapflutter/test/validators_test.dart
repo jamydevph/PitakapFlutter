@@ -116,4 +116,49 @@ void main() {
           Strings.lastNameRequired);
     });
   });
+
+  group('Validators.amount', () {
+    test('rejects null, empty and whitespace-only values as REQUIRED', () {
+      expect(Validators.amount(null), Strings.amountRequired);
+      expect(Validators.amount(''), Strings.amountRequired);
+      expect(Validators.amount('   '), Strings.amountRequired);
+    });
+
+    test('⭐ zero is INVALID, not missing — the messages differ', () {
+      expect(Validators.amount('0'), Strings.amountInvalid);
+      expect(Validators.amount('0.00'), Strings.amountInvalid);
+      expect(Validators.amount('  '), Strings.amountRequired);
+    });
+
+    test('⭐ a negative amount is rejected', () {
+      expect(Validators.amount('-1'), Strings.amountInvalid);
+      expect(Validators.amount('-0.01'), Strings.amountInvalid);
+    });
+
+    test('⭐ anything unparseable is rejected, not silently coerced', () {
+      for (final raw in ['abc', '1,500', '12.34.56', '1 500', '\$100', '--5']) {
+        expect(Validators.amount(raw), Strings.amountInvalid, reason: raw);
+      }
+    });
+
+    test('⭐ a bare decimal point is rejected', () {
+      expect(Validators.amount('.'), Strings.amountInvalid);
+    });
+
+    test('accepts whole numbers and decimals, and ignores surrounding space', () {
+      expect(Validators.amount('1'), isNull);
+      expect(Validators.amount('549'), isNull);
+      expect(Validators.amount('0.01'), isNull);
+      expect(Validators.amount('1234.56'), isNull);
+      expect(Validators.amount('  250  '), isNull);
+    });
+
+    test('a leading decimal point without a whole part is accepted', () {
+      expect(Validators.amount('.5'), isNull);
+    });
+
+    test('⭐ scientific notation parses, so it is accepted — know that', () {
+      expect(Validators.amount('1e3'), isNull);
+    });
+  });
 }

@@ -293,6 +293,107 @@ void main() {
       expect(repository.created, isEmpty);
       expect(find.text('Enter a valid amount'), findsOneWidget);
     });
+
+    testWidgets('⭐ letters never reach the validator — the formatter strips '
+        'them, so the amount reads as MISSING not invalid', (tester) async {
+      sizeViewport(tester);
+
+      final repository = RecordingExpenseRepository();
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.expenses,
+        signedInUid: 'uid-1',
+        expenseRepository: repository,
+      );
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      await fillAmount(tester, 'abc');
+      await fillDescription(tester, 'Milk tea');
+      await tester.tap(find.text('Save expense'));
+      await tester.pumpAndSettle();
+
+      expect(repository.created, isEmpty);
+      expect(find.text('Amount is required'), findsOneWidget);
+      expect(find.text('Enter a valid amount'), findsNothing);
+    });
+
+    testWidgets('⭐ a negative amount cannot be entered at all', (tester) async {
+      sizeViewport(tester);
+
+      final repository = RecordingExpenseRepository();
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.expenses,
+        signedInUid: 'uid-1',
+        expenseRepository: repository,
+      );
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      await fillAmount(tester, '-250');
+      await fillDescription(tester, 'Refund');
+      await tester.tap(find.text('Save expense'));
+      await tester.pumpAndSettle();
+
+      expect(repository.created, isEmpty);
+      expect(find.text('Amount is required'), findsOneWidget);
+    });
+
+    testWidgets('⭐ a whitespace-only description counts as missing', (
+      tester,
+    ) async {
+      sizeViewport(tester);
+
+      final repository = RecordingExpenseRepository();
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.expenses,
+        signedInUid: 'uid-1',
+        expenseRepository: repository,
+      );
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      await fillAmount(tester, '250');
+      await fillDescription(tester, '   ');
+      await tester.tap(find.text('Save expense'));
+      await tester.pumpAndSettle();
+
+      expect(repository.created, isEmpty);
+      expect(find.text('Description is required'), findsOneWidget);
+    });
+
+    testWidgets('⚠️ a thousands separator SILENTLY TRUNCATES — "1,500" keeps '
+        'only "1" and saves as ₱1 with no warning', (tester) async {
+      sizeViewport(tester);
+
+      final repository = RecordingExpenseRepository();
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.expenses,
+        signedInUid: 'uid-1',
+        expenseRepository: repository,
+      );
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      await fillAmount(tester, '1,500');
+      await fillDescription(tester, 'Groceries');
+      await tester.tap(find.text('Save expense'));
+      await tester.pumpAndSettle();
+
+      expect(repository.created, hasLength(1));
+      expect(repository.created.single.amount, 1);
+    });
   });
 
   group('editing an expense', () {

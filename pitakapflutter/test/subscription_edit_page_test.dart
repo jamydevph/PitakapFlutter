@@ -196,6 +196,123 @@ void main() {
       expect(find.text(Strings.amountInvalid), findsOneWidget);
       verifyNever(() => repository.createSubscription(any()));
     });
+
+    testWidgets('⭐ letters never reach the validator — the input formatter '
+        'strips them, so the field reads as MISSING not invalid', (
+      tester,
+    ) async {
+      await pumpForm(tester);
+
+      await tester.enterText(
+        fieldWithLabel(Strings.subscriptionNameLabel),
+        'Netflix',
+      );
+      await tester.enterText(find.byType(TextFormField).first, 'abc');
+      await tester.tap(find.text(Strings.subscriptionSaveAction));
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.amountRequired), findsOneWidget);
+      expect(find.text(Strings.amountInvalid), findsNothing);
+      verifyNever(() => repository.createSubscription(any()));
+    });
+
+    testWidgets('⭐ a negative amount cannot be entered at all — the formatter '
+        'discards the whole value, so it reads as missing', (tester) async {
+      await pumpForm(tester);
+
+      await tester.enterText(
+        fieldWithLabel(Strings.subscriptionNameLabel),
+        'Netflix',
+      );
+      await tester.enterText(find.byType(TextFormField).first, '-100');
+      await tester.tap(find.text(Strings.subscriptionSaveAction));
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.amountRequired), findsOneWidget);
+      verifyNever(() => repository.createSubscription(any()));
+    });
+
+    testWidgets('⭐ more than two decimal places are truncated at input', (
+      tester,
+    ) async {
+      await pumpForm(tester);
+
+      await tester.enterText(find.byType(TextFormField).first, '12.3456');
+      await tester.pumpAndSettle();
+
+      expect(find.text('12.34'), findsOneWidget);
+    });
+
+    testWidgets('⚠️ a thousands separator SILENTLY TRUNCATES — "1,500" keeps '
+        'only "1", which saves as ₱1 with no warning', (tester) async {
+      await pumpForm(tester);
+
+      await tester.enterText(
+        fieldWithLabel(Strings.subscriptionNameLabel),
+        'Netflix',
+      );
+      await tester.enterText(find.byType(TextFormField).first, '1,500');
+      await tester.pumpAndSettle();
+
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text(Strings.amountInvalid), findsNothing);
+    });
+
+    testWidgets('⭐ a whitespace-only name counts as missing', (tester) async {
+      await pumpForm(tester);
+
+      await tester.enterText(
+        fieldWithLabel(Strings.subscriptionNameLabel),
+        '   ',
+      );
+      await tester.enterText(find.byType(TextFormField).first, '549');
+      await tester.tap(find.text(Strings.subscriptionSaveAction));
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.subscriptionNameRequired), findsOneWidget);
+      verifyNever(() => repository.createSubscription(any()));
+    });
+
+    testWidgets('⭐ a valid amount with a missing name still blocks the save', (
+      tester,
+    ) async {
+      await pumpForm(tester);
+
+      await tester.enterText(find.byType(TextFormField).first, '549');
+      await tester.tap(find.text(Strings.subscriptionSaveAction));
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.subscriptionNameRequired), findsOneWidget);
+      expect(find.text(Strings.amountRequired), findsNothing);
+      verifyNever(() => repository.createSubscription(any()));
+    });
+
+    testWidgets('⭐ errors persist while typing — the form validates on save, '
+        'not on change, so a correction clears only on the next save', (
+      tester,
+    ) async {
+      await pumpForm(tester);
+
+      await tester.tap(find.text(Strings.subscriptionSaveAction));
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.subscriptionNameRequired), findsOneWidget);
+      expect(find.text(Strings.amountRequired), findsOneWidget);
+
+      await tester.enterText(
+        fieldWithLabel(Strings.subscriptionNameLabel),
+        'Netflix',
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.subscriptionNameRequired), findsOneWidget);
+
+      await tester.tap(find.text(Strings.subscriptionSaveAction));
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.subscriptionNameRequired), findsNothing);
+      expect(find.text(Strings.amountRequired), findsOneWidget);
+    });
   });
 
   group('saving', () {
