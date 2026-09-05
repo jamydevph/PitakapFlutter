@@ -197,7 +197,7 @@ void main() {
       verifyNever(() => repository.createSubscription(any()));
     });
 
-    testWidgets('⭐ letters never reach the validator — the input formatter '
+    testWidgets('letters never reach the validator — the input formatter '
         'strips them, so the field reads as MISSING not invalid', (
       tester,
     ) async {
@@ -216,23 +216,19 @@ void main() {
       verifyNever(() => repository.createSubscription(any()));
     });
 
-    testWidgets('⭐ a negative amount cannot be entered at all — the formatter '
-        'discards the whole value, so it reads as missing', (tester) async {
+    testWidgets('a minus sign is stripped, so -100 is entered as 100', (
+      tester,
+    ) async {
       await pumpForm(tester);
 
-      await tester.enterText(
-        fieldWithLabel(Strings.subscriptionNameLabel),
-        'Netflix',
-      );
       await tester.enterText(find.byType(TextFormField).first, '-100');
-      await tester.tap(find.text(Strings.subscriptionSaveAction));
       await tester.pumpAndSettle();
 
-      expect(find.text(Strings.amountRequired), findsOneWidget);
-      verifyNever(() => repository.createSubscription(any()));
+      expect(find.text('100'), findsOneWidget);
+      expect(find.text('-100'), findsNothing);
     });
 
-    testWidgets('⭐ more than two decimal places are truncated at input', (
+    testWidgets('more than two decimal places are truncated at input', (
       tester,
     ) async {
       await pumpForm(tester);
@@ -243,8 +239,8 @@ void main() {
       expect(find.text('12.34'), findsOneWidget);
     });
 
-    testWidgets('⚠️ a thousands separator SILENTLY TRUNCATES — "1,500" keeps '
-        'only "1", which saves as ₱1 with no warning', (tester) async {
+    testWidgets('a thousands separator is stripped, not truncated at — '
+        '"1,500" stays 1500 (was ₱1 before Day 29)', (tester) async {
       await pumpForm(tester);
 
       await tester.enterText(
@@ -254,11 +250,11 @@ void main() {
       await tester.enterText(find.byType(TextFormField).first, '1,500');
       await tester.pumpAndSettle();
 
-      expect(find.text('1'), findsOneWidget);
-      expect(find.text(Strings.amountInvalid), findsNothing);
+      expect(find.text('1500'), findsOneWidget);
+      expect(find.text('1'), findsNothing);
     });
 
-    testWidgets('⭐ a whitespace-only name counts as missing', (tester) async {
+    testWidgets('a whitespace-only name counts as missing', (tester) async {
       await pumpForm(tester);
 
       await tester.enterText(
@@ -273,7 +269,7 @@ void main() {
       verifyNever(() => repository.createSubscription(any()));
     });
 
-    testWidgets('⭐ a valid amount with a missing name still blocks the save', (
+    testWidgets('a valid amount with a missing name still blocks the save', (
       tester,
     ) async {
       await pumpForm(tester);
@@ -287,7 +283,7 @@ void main() {
       verifyNever(() => repository.createSubscription(any()));
     });
 
-    testWidgets('⭐ errors persist while typing — the form validates on save, '
+    testWidgets('errors persist while typing — the form validates on save, '
         'not on change, so a correction clears only on the next save', (
       tester,
     ) async {

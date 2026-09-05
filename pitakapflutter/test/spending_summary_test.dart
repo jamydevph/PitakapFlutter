@@ -88,7 +88,7 @@ void main() {
       expect(summary.monthlySubscriptionCost, closeTo(549 + 100 + 100, 0.001));
     });
 
-    test('⭐ yearly is exactly twelve times monthly', () {
+    test('yearly is exactly twelve times monthly', () {
       final summary = useCase.call(
         params(
           subscriptions: [
@@ -119,7 +119,7 @@ void main() {
       expect(summary.monthlySubscriptionCost, 100);
     });
 
-    test('⭐ an inactive subscription is excluded from upcoming payments', () {
+    test('an inactive subscription is excluded from upcoming payments', () {
       final summary = useCase.call(
         params(
           subscriptions: [sub(name: 'Paused', isActive: false)],
@@ -150,7 +150,7 @@ void main() {
       ]);
     });
 
-    test('⭐ ties break by name so the order is stable', () {
+    test('ties break by name so the order is stable', () {
       final summary = useCase.call(
         params(
           subscriptions: [
@@ -201,7 +201,7 @@ void main() {
       expect(payment.daysUntil, 2);
     });
 
-    test('⭐ the clock is a parameter — a later now shifts the whole list', () {
+    test('the clock is a parameter — a later now shifts the whole list', () {
       final subscriptions = [
         sub(name: 'Early', firstBillDate: DateTime(2024, 1, 22)),
         sub(name: 'Later', firstBillDate: DateTime(2024, 1, 28)),

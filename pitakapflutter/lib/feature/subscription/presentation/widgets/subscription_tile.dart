@@ -5,6 +5,9 @@ import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/core/utils/currency_format.dart';
 import 'package:pitakapflutter/feature/subscription/domain/entities/subscription_entity.dart';
 
+String subscriptionAvatarTag(String subscriptionId) =>
+    'subscription-avatar-$subscriptionId';
+
 class SubscriptionTile extends StatelessWidget {
   final SubscriptionEntity subscription;
   final DateTime now;
@@ -49,16 +52,19 @@ class SubscriptionTile extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: accent,
-                child: Text(
-                  subscription.name.isEmpty
-                      ? '?'
-                      : subscription.name.characters.first.toUpperCase(),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
+              Hero(
+                tag: subscriptionAvatarTag(subscription.id),
+                child: CircleAvatar(
+                  radius: 22,
+                  backgroundColor: accent,
+                  child: Text(
+                    subscription.name.isEmpty
+                        ? '?'
+                        : subscription.name.characters.first.toUpperCase(),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),

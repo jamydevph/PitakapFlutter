@@ -154,7 +154,7 @@ void main() {
       expect(find.text(Strings.undoAction), findsOneWidget);
     });
 
-    testWidgets('⭐ undo restores the same document id, it does not re-create', (
+    testWidgets('undo restores the same document id, it does not re-create', (
       tester,
     ) async {
       await pumpList(tester, [sub(id: 'a', name: 'Netflix', amount: 549)]);

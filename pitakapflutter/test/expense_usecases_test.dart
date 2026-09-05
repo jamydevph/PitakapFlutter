@@ -205,7 +205,7 @@ void main() {
       verifyNoMoreInteractions(repository);
     });
 
-    test('⭐ restore is NOT create — the document id must be carried', () async {
+    test('restore is NOT create — the document id must be carried', () async {
       when(() => repository.restoreExpense(any())).thenAnswer((_) async {});
 
       await RestoreExpenseUseCase(repository).call(params);
@@ -218,7 +218,7 @@ void main() {
       verifyNever(() => repository.createExpense(any()));
     });
 
-    test('⭐ the original date is preserved, not reset to today', () async {
+    test('the original date is preserved, not reset to today', () async {
       when(() => repository.restoreExpense(any())).thenAnswer((_) async {});
 
       await RestoreExpenseUseCase(repository).call(params);
@@ -261,7 +261,7 @@ void main() {
       verify(() => repository.watchExpensesForMonth(params)).called(1);
     });
 
-    test('⭐ any day within a month normalises to the first of it', () {
+    test('any day within a month normalises to the first of it', () {
       final fromMidMonth = WatchExpensesForMonthParams(
         userId: 'uid-1',
         month: DateTime(2026, 8, 27, 23, 59, 59),
@@ -270,7 +270,7 @@ void main() {
       expect(fromMidMonth.month, DateTime(2026, 8));
     });
 
-    test('⭐ nextMonth is the exclusive upper bound of the range query', () {
+    test('nextMonth is the exclusive upper bound of the range query', () {
       final august = WatchExpensesForMonthParams(
         userId: 'uid-1',
         month: DateTime(2026, 8, 15),
@@ -279,7 +279,7 @@ void main() {
       expect(august.nextMonth, DateTime(2026, 9));
     });
 
-    test('⭐ December rolls the YEAR, not just the month', () {
+    test('December rolls the YEAR, not just the month', () {
       final december = WatchExpensesForMonthParams(
         userId: 'uid-1',
         month: DateTime(2026, 12, 25),
@@ -289,7 +289,7 @@ void main() {
       expect(december.nextMonth, DateTime(2027));
     });
 
-    test('⭐ two params for the same month are equal, so the provider family '
+    test('two params for the same month are equal, so the provider family '
         'does not open a second subscription', () {
       final a = WatchExpensesForMonthParams(
         userId: 'uid-1',

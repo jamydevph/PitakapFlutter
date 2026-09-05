@@ -100,7 +100,7 @@ void main() {
     return container;
   }
 
-  testWidgets('⭐ reschedules once the user is known', (tester) async {
+  testWidgets('reschedules once the user is known', (tester) async {
     final reminders = RecordingReminderDatasource();
     final repository = RecordingSubscriptionRepository();
 
@@ -114,7 +114,7 @@ void main() {
     expect(repository.rescheduledFor, ['uid-1']);
   });
 
-  testWidgets('⭐ does not reschedule for a signed-out session', (tester) async {
+  testWidgets('does not reschedule for a signed-out session', (tester) async {
     final reminders = RecordingReminderDatasource();
     final repository = RecordingSubscriptionRepository();
 
@@ -128,7 +128,7 @@ void main() {
     expect(repository.rescheduledFor, isEmpty);
   });
 
-  testWidgets('⭐ signing out clears every scheduled reminder', (tester) async {
+  testWidgets('signing out clears every scheduled reminder', (tester) async {
     final reminders = RecordingReminderDatasource();
     final repository = RecordingSubscriptionRepository();
     final auth = StreamController<String?>();
@@ -151,7 +151,7 @@ void main() {
     expect(reminders.cancelAllCalls, 1);
   });
 
-  testWidgets('⭐ a repeated auth emission does not reschedule twice', (
+  testWidgets('a repeated auth emission does not reschedule twice', (
     tester,
   ) async {
     final reminders = RecordingReminderDatasource();
@@ -195,7 +195,7 @@ void main() {
     expect(repository.rescheduledFor, ['uid-1', 'uid-2']);
   });
 
-  testWidgets('⭐ a reschedule failure never breaks the app', (tester) async {
+  testWidgets('a reschedule failure never breaks the app', (tester) async {
     final reminders = RecordingReminderDatasource();
     final repository = RecordingSubscriptionRepository(
       error: const NetworkFailure('No internet connection'),
@@ -212,7 +212,7 @@ void main() {
     expect(repository.rescheduledFor, ['uid-1']);
   });
 
-  testWidgets('⭐ a reminder tap opens that subscription detail page', (
+  testWidgets('a reminder tap opens that subscription detail page', (
     tester,
   ) async {
     final reminders = RecordingReminderDatasource();
@@ -236,7 +236,7 @@ void main() {
     );
   });
 
-  testWidgets('⭐ an empty payload does not navigate anywhere', (tester) async {
+  testWidgets('an empty payload does not navigate anywhere', (tester) async {
     final reminders = RecordingReminderDatasource();
     final repository = RecordingSubscriptionRepository();
 

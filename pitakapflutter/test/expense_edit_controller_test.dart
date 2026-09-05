@@ -146,7 +146,7 @@ void main() {
     );
   });
 
-  test('⭐ a re-entrant create is dropped by the isBusy guard', () async {
+  test('a re-entrant create is dropped by the isBusy guard', () async {
     final repository = GatedExpenseRepository();
     repository.gate = Completer<void>();
 
@@ -164,7 +164,7 @@ void main() {
     expect(repository.createCalls, 1);
   });
 
-  test('⭐ a re-entrant update is dropped by the same guard', () async {
+  test('a re-entrant update is dropped by the same guard', () async {
     final repository = GatedExpenseRepository();
     repository.gate = Completer<void>();
 

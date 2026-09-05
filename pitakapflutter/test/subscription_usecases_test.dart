@@ -191,7 +191,7 @@ void main() {
       verifyNoMoreInteractions(repository);
     });
 
-    test('⭐ restore is NOT create — the document id must be carried', () async {
+    test('restore is NOT create — the document id must be carried', () async {
       when(() => repository.restoreSubscription(any())).thenAnswer((_) async {});
 
       await RestoreSubscriptionUseCase(repository).call(params);
@@ -204,7 +204,7 @@ void main() {
       verifyNever(() => repository.createSubscription(any()));
     });
 
-    test('⭐ every field survives the round trip, not just the id', () async {
+    test('every field survives the round trip, not just the id', () async {
       when(() => repository.restoreSubscription(any())).thenAnswer((_) async {});
 
       await RestoreSubscriptionUseCase(repository).call(params);
@@ -244,7 +244,7 @@ void main() {
       verifyNoMoreInteractions(repository);
     });
 
-    test('⭐ it does not read the subscription stream itself', () async {
+    test('it does not read the subscription stream itself', () async {
       when(
         () => repository.rescheduleAllReminders(any()),
       ).thenAnswer((_) async {});

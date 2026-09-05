@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:pitakapflutter/core/error/failure.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
-import 'package:pitakapflutter/core/utils/billing_date_utils.dart';
+import 'package:pitakapflutter/core/utils/date_utils.dart';
 import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.dart';
 import 'package:pitakapflutter/feature/expense/domain/repository/expense_repository.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_usecase.dart';
@@ -275,7 +275,7 @@ void main() {
       expect(find.text('Undo'), findsOneWidget);
     });
 
-    testWidgets('⭐ undo restores the same document, it does not re-create', (
+    testWidgets('undo restores the same document, it does not re-create', (
       tester,
     ) async {
       sizeViewport(tester);

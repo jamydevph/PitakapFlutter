@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:pitakapflutter/core/error/failure.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
-import 'package:pitakapflutter/core/utils/billing_date_utils.dart';
+import 'package:pitakapflutter/core/utils/date_utils.dart';
 import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.dart';
 import 'package:pitakapflutter/feature/expense/domain/repository/expense_repository.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_usecase.dart';
@@ -160,7 +160,7 @@ void main() {
       expect(params.date, today);
     });
 
-    testWidgets('⭐ the date defaults to the SELECTED day, not today', (
+    testWidgets('the date defaults to the SELECTED day, not today', (
       tester,
     ) async {
       sizeViewport(tester);
@@ -294,7 +294,7 @@ void main() {
       expect(find.text('Enter a valid amount'), findsOneWidget);
     });
 
-    testWidgets('⭐ letters never reach the validator — the formatter strips '
+    testWidgets('letters never reach the validator — the formatter strips '
         'them, so the amount reads as MISSING not invalid', (tester) async {
       sizeViewport(tester);
 
@@ -320,7 +320,9 @@ void main() {
       expect(find.text('Enter a valid amount'), findsNothing);
     });
 
-    testWidgets('⭐ a negative amount cannot be entered at all', (tester) async {
+    testWidgets('a minus sign is stripped, so -250 saves as 250', (
+      tester,
+    ) async {
       sizeViewport(tester);
 
       final repository = RecordingExpenseRepository();
@@ -340,11 +342,11 @@ void main() {
       await tester.tap(find.text('Save expense'));
       await tester.pumpAndSettle();
 
-      expect(repository.created, isEmpty);
-      expect(find.text('Amount is required'), findsOneWidget);
+      expect(repository.created, hasLength(1));
+      expect(repository.created.single.amount, 250);
     });
 
-    testWidgets('⭐ a whitespace-only description counts as missing', (
+    testWidgets('a whitespace-only description counts as missing', (
       tester,
     ) async {
       sizeViewport(tester);
@@ -370,8 +372,8 @@ void main() {
       expect(find.text('Description is required'), findsOneWidget);
     });
 
-    testWidgets('⚠️ a thousands separator SILENTLY TRUNCATES — "1,500" keeps '
-        'only "1" and saves as ₱1 with no warning', (tester) async {
+    testWidgets('a thousands separator is stripped, not truncated at — '
+        '"1,500" saves as 1500 (was ₱1 before Day 29)', (tester) async {
       sizeViewport(tester);
 
       final repository = RecordingExpenseRepository();
@@ -392,7 +394,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repository.created, hasLength(1));
-      expect(repository.created.single.amount, 1);
+      expect(repository.created.single.amount, 1500);
     });
   });
 
@@ -419,7 +421,7 @@ void main() {
       expect(find.text('Lunch at Jollibee'), findsOneWidget);
     });
 
-    testWidgets('⭐ an edit preserves id, userId, currency and createdAt', (
+    testWidgets('an edit preserves id, userId, currency and createdAt', (
       tester,
     ) async {
       sizeViewport(tester);

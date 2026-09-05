@@ -35,7 +35,7 @@ void main() {
       expect(reminderIdFor('abc123'), isNot(reminderIdFor('abc124')));
     });
 
-    test('⭐ always fits a positive 31-bit int', () {
+    test('always fits a positive 31-bit int', () {
       final ids = [
         '',
         'a',
@@ -64,14 +64,14 @@ void main() {
       );
     });
 
-    test('⭐ one day before says tomorrow, never "in 1 days"', () {
+    test('one day before says tomorrow, never "in 1 days"', () {
       expect(
         reminderBodyFor(name: 'Netflix', daysBefore: 1),
         'Netflix renews tomorrow',
       );
     });
 
-    test('⭐ same-day says today, never "in 0 days"', () {
+    test('same-day says today, never "in 0 days"', () {
       expect(
         reminderBodyFor(name: 'Netflix', daysBefore: 0),
         'Netflix renews today',
@@ -112,7 +112,7 @@ void main() {
       expect(fireAt, DateTime(2026, 8, 20, reminderHourOfDay));
     });
 
-    test('⭐ crosses a month boundary backwards', () {
+    test('crosses a month boundary backwards', () {
       final fireAt = reminderTimeFor(
         dueDate: DateTime(2026, 9, 2),
         daysBefore: 5,
@@ -121,7 +121,7 @@ void main() {
       expect(fireAt, DateTime(2026, 8, 28, reminderHourOfDay));
     });
 
-    test('⭐ crosses a leap day backwards', () {
+    test('crosses a leap day backwards', () {
       final fireAt = reminderTimeFor(
         dueDate: DateTime(2028, 3, 1),
         daysBefore: 2,
@@ -163,7 +163,7 @@ void main() {
       expect(reminder.id, reminderIdFor('sub-1'));
     });
 
-    test('⭐ an inactive subscription gets no reminder', () {
+    test('an inactive subscription gets no reminder', () {
       final reminder = reminderFor(
         sub(isActive: false),
         now: DateTime(2026, 8, 1),
@@ -172,7 +172,7 @@ void main() {
       expect(reminder, isNull);
     });
 
-    test('⭐ skips to the following cycle when this one already passed', () {
+    test('skips to the following cycle when this one already passed', () {
       final reminder = reminderFor(
         sub(firstBillDate: DateTime(2024, 1, 20), reminderDaysBefore: 3),
         now: DateTime(2026, 8, 18, 10),
@@ -183,7 +183,7 @@ void main() {
       expect(reminder.fireAt, DateTime(2026, 9, 17, reminderHourOfDay));
     });
 
-    test('⭐ the boundary is strict — a fire time of exactly now is skipped', () {
+    test('the boundary is strict — a fire time of exactly now is skipped', () {
       final now = DateTime(2026, 8, 17, reminderHourOfDay);
 
       final reminder = reminderFor(
@@ -207,7 +207,7 @@ void main() {
       expect(reminder.dueDate, DateTime(2026, 8, 20));
     });
 
-    test('⭐ every cycle produces a future fire time', () {
+    test('every cycle produces a future fire time', () {
       final now = DateTime(2026, 8, 18, 14);
 
       for (final cycle in BillingCycle.values) {

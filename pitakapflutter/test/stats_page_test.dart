@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pitakapflutter/core/error/failure.dart';
 import 'package:pitakapflutter/core/resources/billing_cycle.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
-import 'package:pitakapflutter/core/utils/billing_date_utils.dart';
+import 'package:pitakapflutter/core/utils/date_utils.dart';
 import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.dart';
 import 'package:pitakapflutter/feature/expense/domain/repository/expense_repository.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_usecase.dart';
@@ -166,7 +166,7 @@ void main() {
       expect(find.text('60%'), findsOneWidget);
     });
 
-    testWidgets('⭐ the month query is a range over the selected month', (
+    testWidgets('the month query is a range over the selected month', (
       tester,
     ) async {
       sizeViewport(tester);
@@ -231,7 +231,7 @@ void main() {
       expect(repository.monthQueries.last.month, lastMonth);
     });
 
-    testWidgets('⭐ the next-month arrow is disabled on the current month', (
+    testWidgets('the next-month arrow is disabled on the current month', (
       tester,
     ) async {
       sizeViewport(tester);
@@ -301,7 +301,7 @@ void main() {
   });
 
   group('StatsPage — subscriptions', () {
-    testWidgets('⭐ switching mode shows subscription categories', (
+    testWidgets('switching mode shows subscription categories', (
       tester,
     ) async {
       sizeViewport(tester);
@@ -328,7 +328,7 @@ void main() {
       expect(find.byIcon(Icons.chevron_left), findsNothing);
     });
 
-    testWidgets('⭐ the yearly view multiplies the monthly total by twelve', (
+    testWidgets('the yearly view multiplies the monthly total by twelve', (
       tester,
     ) async {
       sizeViewport(tester);

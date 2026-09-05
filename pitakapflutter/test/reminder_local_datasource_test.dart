@@ -62,7 +62,7 @@ void main() {
       ).called(1);
     });
 
-    test('⭐ a plugin failure surfaces as NotificationFailure', () async {
+    test('a plugin failure surfaces as NotificationFailure', () async {
       when(
         () => plugin.initialize(
           settings: any(named: 'settings'),
@@ -81,7 +81,7 @@ void main() {
       );
     });
 
-    test('⭐ the raw platform error never reaches the message', () async {
+    test('the raw platform error never reaches the message', () async {
       when(
         () => plugin.initialize(
           settings: any(named: 'settings'),
@@ -149,7 +149,7 @@ void main() {
       expect(captured[4], 'sub-1');
     });
 
-    test('⭐ uses an inexact schedule mode, so no exact-alarm permission', () async {
+    test('uses an inexact schedule mode, so no exact-alarm permission', () async {
       when(
         () => plugin.zonedSchedule(
           id: any(named: 'id'),
@@ -237,7 +237,7 @@ void main() {
   });
 
   group('onReminderTap', () {
-    test('⭐ a tap reports the payload as the subscription id', () {
+    test('a tap reports the payload as the subscription id', () {
       final tapped = <String>[];
       datasource.onReminderTap = tapped.add;
 
@@ -252,7 +252,7 @@ void main() {
       expect(tapped, ['sub-42']);
     });
 
-    test('⭐ a null payload is ignored, never routed as an empty id', () {
+    test('a null payload is ignored, never routed as an empty id', () {
       final tapped = <String>[];
       datasource.onReminderTap = tapped.add;
 
@@ -281,7 +281,7 @@ void main() {
       expect(tapped, isEmpty);
     });
 
-    test('⭐ a tap with no handler attached does not throw', () {
+    test('a tap with no handler attached does not throw', () {
       datasource.onReminderTap = null;
 
       expect(

@@ -113,7 +113,7 @@ void main() {
       verifyNoMoreInteractions(remote);
     });
 
-    test('⭐ schedules a reminder keyed by the id the write returned', () async {
+    test('schedules a reminder keyed by the id the write returned', () async {
       when(
         () => remote.createSubscription(any()),
       ).thenAnswer((_) async => 'generated-id');
@@ -133,7 +133,7 @@ void main() {
       expect(id, reminderIdFor('generated-id'));
     });
 
-    test('⭐ the payload is the document id, so a tap can deep-link', () async {
+    test('the payload is the document id, so a tap can deep-link', () async {
       when(
         () => remote.createSubscription(any()),
       ).thenAnswer((_) async => 'generated-id');
@@ -163,7 +163,7 @@ void main() {
       );
     });
 
-    test('⭐ a reminder failure never fails the write', () async {
+    test('a reminder failure never fails the write', () async {
       when(
         () => remote.createSubscription(any()),
       ).thenAnswer((_) async => 'generated-id');
@@ -193,7 +193,7 @@ void main() {
       verifyNoMoreInteractions(remote);
     });
 
-    test('⭐ reschedules against the edited subscription', () async {
+    test('reschedules against the edited subscription', () async {
       when(() => remote.updateSubscription(any())).thenAnswer((_) async {});
 
       await repository.updateSubscription(params);
@@ -214,7 +214,7 @@ void main() {
       expect(captured[3], DateTime(2026, 8, 28, reminderHourOfDay));
     });
 
-    test('⭐ deactivating cancels instead of scheduling', () async {
+    test('deactivating cancels instead of scheduling', () async {
       when(() => remote.updateSubscription(any())).thenAnswer((_) async {});
 
       final paused = SubscriptionModel(
@@ -256,7 +256,7 @@ void main() {
       verifyNoMoreInteractions(remote);
     });
 
-    test('⭐ cancels the reminder for the deleted id', () async {
+    test('cancels the reminder for the deleted id', () async {
       when(() => remote.deleteSubscription(any())).thenAnswer((_) async {});
 
       await repository.deleteSubscription(params);
@@ -274,7 +274,7 @@ void main() {
       );
     });
 
-    test('⭐ a cancel failure never fails the delete', () async {
+    test('a cancel failure never fails the delete', () async {
       when(() => remote.deleteSubscription(any())).thenAnswer((_) async {});
       when(
         () => reminders.cancelReminder(any()),
@@ -287,7 +287,7 @@ void main() {
   group('restoreSubscription', () {
     final params = RestoreSubscriptionUseCaseParams(netflix);
 
-    test('⭐ writes back the same document, it does not create a new one', () async {
+    test('writes back the same document, it does not create a new one', () async {
       when(() => remote.restoreSubscription(any())).thenAnswer((_) async {});
 
       await repository.restoreSubscription(params);
@@ -300,7 +300,7 @@ void main() {
       verifyNever(() => remote.createSubscription(any()));
     });
 
-    test('⭐ the reminder id survives the undo', () async {
+    test('the reminder id survives the undo', () async {
       when(() => remote.restoreSubscription(any())).thenAnswer((_) async {});
 
       await repository.restoreSubscription(params);
@@ -320,7 +320,7 @@ void main() {
   });
 
   group('rescheduleAllReminders', () {
-    test('⭐ clears everything first, then schedules each subscription', () async {
+    test('clears everything first, then schedules each subscription', () async {
       final spotify = SubscriptionModel(
         id: 'sub-2',
         userId: 'uid-1',
@@ -355,7 +355,7 @@ void main() {
       ]);
     });
 
-    test('⭐ takes only the first snapshot, it does not keep listening', () async {
+    test('takes only the first snapshot, it does not keep listening', () async {
       var listens = 0;
 
       when(() => remote.watchSubscriptions(any())).thenAnswer((_) {
@@ -388,7 +388,7 @@ void main() {
       verify(() => reminders.cancelReminder(reminderIdFor('sub-3'))).called(1);
     });
 
-    test('⭐ a notification failure never escapes to the caller', () async {
+    test('a notification failure never escapes to the caller', () async {
       when(
         () => remote.watchSubscriptions(any()),
       ).thenAnswer((_) => Stream.value([netflix]));

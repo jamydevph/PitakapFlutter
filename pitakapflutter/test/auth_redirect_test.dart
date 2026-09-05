@@ -89,7 +89,7 @@ void main() {
       expect(find.text(Strings.signOutAction), findsOneWidget);
     });
 
-    testWidgets('⭐ it confirms first — one tap does not sign you out', (
+    testWidgets('it confirms first — one tap does not sign you out', (
       tester,
     ) async {
       final repository = MockAuthRepository();

@@ -23,12 +23,12 @@ void main() {
   }
 
   group('labels', () {
-    test('⭐ a same-day reminder never reads "0 days before"', () {
+    test('a same-day reminder never reads "0 days before"', () {
       expect(reminderDaysLabel(0), Strings.reminderSameDay);
       expect(reminderDaysLabel(-1), Strings.reminderSameDay);
     });
 
-    test('⭐ one day reads as "1 day before", not "1 days"', () {
+    test('one day reads as "1 day before", not "1 days"', () {
       expect(reminderDaysLabel(1), Strings.reminderOneDay);
     });
 
@@ -66,7 +66,7 @@ void main() {
       expect(container.read(defaultCurrencyProvider), 'USD');
     });
 
-    test('⭐ an unknown stored code falls back instead of being trusted', () async {
+    test('an unknown stored code falls back instead of being trusted', () async {
       final container = await containerWith({
         ...onboarded,
         Keys.prefsDefaultCurrency: 'XYZ',
@@ -76,7 +76,7 @@ void main() {
       expect(container.read(defaultCurrencyProvider), Constants.defaultCurrency);
     });
 
-    test('⭐ a selection persists to shared preferences', () async {
+    test('a selection persists to shared preferences', () async {
       final container = await containerWith(onboarded);
       addTearDown(container.dispose);
 
@@ -88,7 +88,7 @@ void main() {
       expect(prefs.getString(Keys.prefsDefaultCurrency), 'JPY');
     });
 
-    test('⭐ an unsupported code is rejected, not written', () async {
+    test('an unsupported code is rejected, not written', () async {
       final container = await containerWith(onboarded);
       addTearDown(container.dispose);
 
@@ -112,7 +112,7 @@ void main() {
       );
     });
 
-    test('⭐ zero is a real stored value, not "unset"', () async {
+    test('zero is a real stored value, not "unset"', () async {
       final container = await containerWith({
         ...onboarded,
         Keys.prefsDefaultReminderDays: 0,
@@ -122,7 +122,7 @@ void main() {
       expect(container.read(defaultReminderDaysProvider), 0);
     });
 
-    test('⭐ a value outside the offered options falls back', () async {
+    test('a value outside the offered options falls back', () async {
       final container = await containerWith({
         ...onboarded,
         Keys.prefsDefaultReminderDays: 99,
@@ -191,7 +191,7 @@ void main() {
       );
     });
 
-    testWidgets('⭐ picking a currency persists it and updates the row', (
+    testWidgets('picking a currency persists it and updates the row', (
       tester,
     ) async {
       sizeViewport(tester);
@@ -214,7 +214,7 @@ void main() {
       expect(find.text(currencyLabel('USD')), findsOneWidget);
     });
 
-    testWidgets('⭐ picking a reminder lead time persists it', (tester) async {
+    testWidgets('picking a reminder lead time persists it', (tester) async {
       sizeViewport(tester);
 
       final container = await pumpAppAt(
@@ -234,7 +234,7 @@ void main() {
       expect(container.read(defaultReminderDaysProvider), 7);
     });
 
-    testWidgets('⭐ picking a theme mode persists it', (tester) async {
+    testWidgets('picking a theme mode persists it', (tester) async {
       sizeViewport(tester);
 
       final container = await pumpAppAt(
@@ -267,7 +267,7 @@ void main() {
   });
 
   group('delete account', () {
-    testWidgets('⭐ it confirms first — one tap does not delete', (
+    testWidgets('it confirms first — one tap does not delete', (
       tester,
     ) async {
       sizeViewport(tester);
@@ -291,7 +291,7 @@ void main() {
       verifyNever(() => repository.deleteAccount());
     });
 
-    testWidgets('⭐ the warning says the data goes too', (tester) async {
+    testWidgets('the warning says the data goes too', (tester) async {
       sizeViewport(tester);
 
       await pumpAppAt(tester, AppRoutes.settings, signedInUid: 'uid-1');
@@ -351,7 +351,7 @@ void main() {
       verify(() => repository.deleteAccount()).called(1);
     });
 
-    testWidgets('⭐ a stale-login failure surfaces its mapped message', (
+    testWidgets('a stale-login failure surfaces its mapped message', (
       tester,
     ) async {
       sizeViewport(tester);
@@ -378,7 +378,7 @@ void main() {
       expect(find.text('Please sign in again to continue'), findsOneWidget);
     });
 
-    testWidgets('⭐ a raw error never leaks its internals', (tester) async {
+    testWidgets('a raw error never leaks its internals', (tester) async {
       sizeViewport(tester);
 
       final repository = MockAuthRepository();

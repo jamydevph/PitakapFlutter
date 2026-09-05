@@ -8,7 +8,7 @@ import 'package:pitakapflutter/core/providers/expense_providers.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
-import 'package:pitakapflutter/core/utils/billing_date_utils.dart';
+import 'package:pitakapflutter/core/utils/date_utils.dart';
 import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/restore_expense_usecase.dart';
@@ -227,14 +227,17 @@ class _ExpenseList extends StatelessWidget {
       itemBuilder: (context, index) {
         final expense = expenses[index];
 
-        return Dismissible(
-          key: ValueKey(expense.id),
-          direction: DismissDirection.endToStart,
-          onDismissed: (_) => onDelete(expense),
-          background: const _DeleteBackground(),
-          child: ExpenseTile(
-            expense: expense,
-            onTap: () => onOpen(expense),
+        return CommonListEntrance(
+          index: index,
+          child: Dismissible(
+            key: ValueKey(expense.id),
+            direction: DismissDirection.endToStart,
+            onDismissed: (_) => onDelete(expense),
+            background: const _DeleteBackground(),
+            child: ExpenseTile(
+              expense: expense,
+              onTap: () => onOpen(expense),
+            ),
           ),
         );
       },

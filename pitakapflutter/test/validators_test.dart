@@ -124,24 +124,24 @@ void main() {
       expect(Validators.amount('   '), Strings.amountRequired);
     });
 
-    test('⭐ zero is INVALID, not missing — the messages differ', () {
+    test('zero is INVALID, not missing — the messages differ', () {
       expect(Validators.amount('0'), Strings.amountInvalid);
       expect(Validators.amount('0.00'), Strings.amountInvalid);
       expect(Validators.amount('  '), Strings.amountRequired);
     });
 
-    test('⭐ a negative amount is rejected', () {
+    test('a negative amount is rejected', () {
       expect(Validators.amount('-1'), Strings.amountInvalid);
       expect(Validators.amount('-0.01'), Strings.amountInvalid);
     });
 
-    test('⭐ anything unparseable is rejected, not silently coerced', () {
+    test('anything unparseable is rejected, not silently coerced', () {
       for (final raw in ['abc', '1,500', '12.34.56', '1 500', '\$100', '--5']) {
         expect(Validators.amount(raw), Strings.amountInvalid, reason: raw);
       }
     });
 
-    test('⭐ a bare decimal point is rejected', () {
+    test('a bare decimal point is rejected', () {
       expect(Validators.amount('.'), Strings.amountInvalid);
     });
 
@@ -157,7 +157,7 @@ void main() {
       expect(Validators.amount('.5'), isNull);
     });
 
-    test('⭐ scientific notation parses, so it is accepted — know that', () {
+    test('scientific notation parses, so it is accepted — know that', () {
       expect(Validators.amount('1e3'), isNull);
     });
   });

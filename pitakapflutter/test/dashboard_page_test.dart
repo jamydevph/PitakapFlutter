@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pitakapflutter/core/error/failure.dart';
 import 'package:pitakapflutter/core/resources/billing_cycle.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
-import 'package:pitakapflutter/core/utils/billing_date_utils.dart';
+import 'package:pitakapflutter/core/utils/date_utils.dart';
 import 'package:pitakapflutter/feature/auth/domain/entities/user_details_entity.dart';
 import 'package:pitakapflutter/feature/dashboard/presentation/dashboard_page.dart';
 import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.dart';
@@ -179,7 +179,7 @@ void main() {
       expect(find.textContaining('Good'), findsOneWidget);
     });
 
-    testWidgets('⭐ shows spent today, both subscription totals and the count', (
+    testWidgets('shows spent today, both subscription totals and the count', (
       tester,
     ) async {
       sizeViewport(tester);

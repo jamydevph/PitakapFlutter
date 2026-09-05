@@ -189,7 +189,7 @@ void main() {
       verifyNoMoreInteractions(repository);
     });
 
-    test('⭐ it is NOT sign out — the two must never be confused', () async {
+    test('it is NOT sign out — the two must never be confused', () async {
       when(() => repository.deleteAccount()).thenAnswer((_) async {});
 
       await DeleteAccountUseCase(repository).call();
@@ -197,7 +197,7 @@ void main() {
       verifyNever(() => repository.signOut());
     });
 
-    test('⭐ a stale-login failure propagates so the UI can ask for a re-login', () {
+    test('a stale-login failure propagates so the UI can ask for a re-login', () {
       when(() => repository.deleteAccount())
           .thenThrow(const ServerFailure('Please sign in again to continue'));
 
@@ -232,7 +232,7 @@ void main() {
       expect(WatchAuthStateUseCase(repository).call(), emits('uid-1'));
     });
 
-    test('⭐ a signed-out session is null, not an empty string', () {
+    test('a signed-out session is null, not an empty string', () {
       when(
         () => repository.authStateChanges(),
       ).thenAnswer((_) => Stream.value(null));
@@ -240,7 +240,7 @@ void main() {
       expect(WatchAuthStateUseCase(repository).call(), emits(isNull));
     });
 
-    test('⭐ sign-in then sign-out arrives as an ordered sequence', () {
+    test('sign-in then sign-out arrives as an ordered sequence', () {
       when(
         () => repository.authStateChanges(),
       ).thenAnswer((_) => Stream.fromIterable(['uid-1', null, 'uid-2']));
@@ -273,7 +273,7 @@ void main() {
       verify(() => repository.watchUserDetails('uid-1')).called(1);
     });
 
-    test('⭐ a missing profile document emits null rather than erroring', () {
+    test('a missing profile document emits null rather than erroring', () {
       when(
         () => repository.watchUserDetails(any()),
       ).thenAnswer((_) => Stream.value(null));

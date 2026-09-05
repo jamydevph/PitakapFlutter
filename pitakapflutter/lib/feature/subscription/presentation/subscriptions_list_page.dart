@@ -201,15 +201,18 @@ class _SubscriptionList extends StatelessWidget {
       itemBuilder: (context, index) {
         final subscription = subscriptions[index];
 
-        return Dismissible(
-          key: ValueKey(subscription.id),
-          direction: DismissDirection.endToStart,
-          onDismissed: (_) => onDelete(subscription),
-          background: const _DeleteBackground(),
-          child: SubscriptionTile(
-            subscription: subscription,
-            now: now,
-            onTap: () => onOpen(subscription),
+        return CommonListEntrance(
+          index: index,
+          child: Dismissible(
+            key: ValueKey(subscription.id),
+            direction: DismissDirection.endToStart,
+            onDismissed: (_) => onDelete(subscription),
+            background: const _DeleteBackground(),
+            child: SubscriptionTile(
+              subscription: subscription,
+              now: now,
+              onTap: () => onOpen(subscription),
+            ),
           ),
         );
       },

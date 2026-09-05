@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -11,6 +10,7 @@ import 'package:pitakapflutter/core/resources/constants.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
+import 'package:pitakapflutter/core/utils/amount_input_formatter.dart';
 import 'package:pitakapflutter/core/utils/currency_format.dart';
 import 'package:pitakapflutter/core/utils/label_format.dart';
 import 'package:pitakapflutter/core/utils/validators.dart';
@@ -344,11 +344,7 @@ class _AmountCard extends StatelessWidget {
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                      RegExp(r'^\d*\.?\d{0,2}'),
-                    ),
-                  ],
+                  inputFormatters: const [AmountInputFormatter()],
                   style: theme.textTheme.displaySmall,
                   decoration: const InputDecoration(
                     hintText: '0',

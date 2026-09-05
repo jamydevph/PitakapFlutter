@@ -12,6 +12,7 @@ import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/core/utils/currency_format.dart';
 import 'package:pitakapflutter/core/utils/label_format.dart';
 import 'package:pitakapflutter/feature/subscription/domain/entities/subscription_entity.dart';
+import 'package:pitakapflutter/feature/subscription/presentation/widgets/subscription_tile.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/providers/subscription_edit_controller.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/providers/subscription_edit_state.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/subscription_edit_page.dart';
@@ -236,16 +237,19 @@ class _Header extends StatelessWidget {
 
     return Column(
       children: [
-        CircleAvatar(
-          radius: 36,
-          backgroundColor: accent,
-          child: Text(
-            subscription.name.isEmpty
-                ? '?'
-                : subscription.name.characters.first.toUpperCase(),
-            style: theme.textTheme.headlineMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
+        Hero(
+          tag: subscriptionAvatarTag(subscription.id),
+          child: CircleAvatar(
+            radius: 36,
+            backgroundColor: accent,
+            child: Text(
+              subscription.name.isEmpty
+                  ? '?'
+                  : subscription.name.characters.first.toUpperCase(),
+              style: theme.textTheme.headlineMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),

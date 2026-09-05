@@ -86,7 +86,7 @@ void main() {
       ]);
     });
 
-    test('⭐ equal amounts fall back to the canonical category order', () {
+    test('equal amounts fall back to the canonical category order', () {
       final breakdown = expenseBreakdown([
         expense(id: 'a', category: 'shopping', amount: 100),
         expense(id: 'b', category: 'food', amount: 100),
@@ -107,7 +107,7 @@ void main() {
       expect(breakdown.total, 0);
     });
 
-    test('⭐ shares always sum to one', () {
+    test('shares always sum to one', () {
       final breakdown = expenseBreakdown([
         expense(id: 'a', category: 'food', amount: 33.33),
         expense(id: 'b', category: 'transport', amount: 33.33),
@@ -137,7 +137,7 @@ void main() {
       expect(breakdown.total, closeTo(549 + 100, 0.001));
     });
 
-    test('⭐ the yearly view is exactly twelve times the monthly view', () {
+    test('the yearly view is exactly twelve times the monthly view', () {
       final subscriptions = [
         sub(name: 'Netflix', category: 'entertainment', amount: 549),
         sub(
@@ -160,7 +160,7 @@ void main() {
       expect(yearly.total, closeTo(monthly.total * 12, 0.001));
     });
 
-    test('⭐ excludes inactive subscriptions', () {
+    test('excludes inactive subscriptions', () {
       final breakdown = subscriptionBreakdown(
         [
           sub(name: 'Live', category: 'entertainment', amount: 100),

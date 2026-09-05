@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:pitakapflutter/core/resources/billing_cycle.dart';
-import 'package:pitakapflutter/core/utils/billing_date_utils.dart';
+import 'package:pitakapflutter/core/utils/date_utils.dart';
 
 DateTime due(DateTime anchor, BillingCycle cycle, DateTime from) {
   return nextDueDate(

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pitakapflutter/core/resources/billing_cycle.dart';
 import 'package:pitakapflutter/core/resources/constants.dart';
 import 'package:pitakapflutter/core/resources/keys.dart';
-import 'package:pitakapflutter/core/utils/billing_date_utils.dart';
+import 'package:pitakapflutter/core/utils/date_utils.dart';
 import 'package:pitakapflutter/feature/subscription/domain/entities/subscription_entity.dart';
 
 class SubscriptionModel extends SubscriptionEntity {
