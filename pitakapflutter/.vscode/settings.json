@@ -24,5 +24,6 @@
     "*.ttf": "default"
   },
   "git.autofetch": true,
-  "git.enableSmartCommit": true
+  "git.enableSmartCommit": true,
+  "java.compile.nullAnalysis.mode": "automatic"
 }
