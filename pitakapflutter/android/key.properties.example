@@ -1,0 +1,13 @@
+# Copy to android/key.properties and fill in. NEVER commit the real file —
+# android/.gitignore already excludes key.properties, *.jks and *.keystore.
+#
+# Generate the keystore (keep it somewhere safe and BACK IT UP — losing it means
+# you can never ship an update to the same Play Store listing again):
+#
+#   keytool -genkey -v -keystore ~/pitakap-upload-keystore.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+storePassword=<the store password you chose>
+keyPassword=<the key password you chose>
+keyAlias=upload
+storeFile=/Users/<you>/pitakap-upload-keystore.jks
