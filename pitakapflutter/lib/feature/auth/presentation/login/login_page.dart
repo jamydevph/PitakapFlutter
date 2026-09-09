@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pitakapflutter/core/common/common.dart';
+import 'package:pitakapflutter/core/resources/constants.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
@@ -184,12 +185,10 @@ class _GoogleButton extends StatelessWidget {
 
   const _GoogleButton({required this.onPressed, required this.isLoading});
 
-  static const Color _googleBlue = Color(0xFF4285F4);
+  static const double googleLogoSize = 18;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return OutlinedButton(
       onPressed: isLoading ? null : onPressed,
       child: isLoading
@@ -197,12 +196,11 @@ class _GoogleButton extends StatelessWidget {
           : Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'G',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: _googleBlue,
-                    fontWeight: FontWeight.w700,
-                  ),
+                Image.asset(
+                  Constants.googleLogoAsset,
+                  width: googleLogoSize,
+                  height: googleLogoSize,
+                  filterQuality: FilterQuality.medium,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 const Text(Strings.loginContinueWithGoogle),

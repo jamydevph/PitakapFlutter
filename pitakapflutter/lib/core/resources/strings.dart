@@ -176,6 +176,9 @@ class Strings {
   static const String settingsPreferencesSection = 'Preferences';
   static const String settingsAccountSection = 'Account';
   static const String settingsAboutSection = 'About';
+  static const String settingsPrivacyPolicyLabel = 'Privacy Policy';
+  static const String settingsTermsLabel = 'Terms of Service';
+  static const String settingsLinkFailed = 'Could not open the link';
 
   static const String settingsCurrencyLabel = 'Default currency';
   static const String settingsCurrencyHint =

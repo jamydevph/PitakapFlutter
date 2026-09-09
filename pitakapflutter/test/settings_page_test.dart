@@ -264,6 +264,29 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('offers the privacy policy and terms, which both stores '
+        'require to be reachable in-app', (tester) async {
+      sizeViewport(tester);
+
+      await pumpAppAt(tester, AppRoutes.settings, signedInUid: 'uid-1');
+
+      expect(find.text(Strings.settingsPrivacyPolicyLabel), findsOneWidget);
+      expect(find.text(Strings.settingsTermsLabel), findsOneWidget);
+    });
+
+    test('the policy URLs are absolute https links, not placeholders', () {
+      for (final url in [
+        Constants.privacyPolicyUrl,
+        Constants.termsOfServiceUrl,
+      ]) {
+        final uri = Uri.parse(url);
+        expect(uri.isAbsolute, isTrue, reason: '$url must be absolute');
+        expect(uri.scheme, 'https', reason: '$url must be https');
+        expect(uri.host, isNotEmpty);
+      }
+      expect(Constants.privacyPolicyUrl, isNot(Constants.termsOfServiceUrl));
+    });
   });
 
   group('delete account', () {

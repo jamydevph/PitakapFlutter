@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:pitakapflutter/core/resources/constants.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/widgets/app_logo.dart';
 import 'package:pitakapflutter/feature/auth/presentation/login/login_page.dart';
@@ -21,6 +22,23 @@ void main() {
       expect(find.text(Strings.loginSignIn), findsOneWidget);
       expect(find.text(Strings.loginOr), findsOneWidget);
       expect(find.text(Strings.loginContinueWithGoogle), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) =>
+              w is Image &&
+              w.image is AssetImage &&
+              (w.image as AssetImage).assetName == Constants.googleLogoAsset,
+        ),
+        findsOneWidget,
+        reason:
+            'Google Sign-In branding guidelines require the official mark, '
+            'not a typed letter',
+      );
+      expect(
+        find.text('G'),
+        findsNothing,
+        reason: 'the placeholder letter G must never come back',
+      );
       expect(
         find.textContaining(Strings.loginSignUpLink, findRichText: true),
         findsOneWidget,

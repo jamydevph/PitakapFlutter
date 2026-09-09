@@ -7,6 +7,13 @@ class Constants {
 
   static const String appVersion = '1.0.0';
 
+  static const String googleLogoAsset = 'assets/branding/google_g_logo.png';
+
+  static const String privacyPolicyUrl =
+      'https://github.com/jamydevph/PitakapFlutter/blob/main/docs/privacy-policy.md';
+  static const String termsOfServiceUrl =
+      'https://github.com/jamydevph/PitakapFlutter/blob/main/docs/terms-of-service.md';
+
   static const List<String> currencies = [
     'PHP',
     'USD',

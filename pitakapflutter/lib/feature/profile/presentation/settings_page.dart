@@ -10,6 +10,7 @@ import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/core/utils/currency_format.dart';
 import 'package:pitakapflutter/feature/auth/domain/entities/user_details_entity.dart';
 import 'package:pitakapflutter/feature/profile/presentation/widgets/settings_section.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 String reminderDaysLabel(int days) {
   if (days <= 0) return Strings.reminderSameDay;
@@ -35,6 +36,17 @@ class SettingsPage extends ConsumerStatefulWidget {
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _isBusy = false;
+
+  Future<void> _openUrl(String url) async {
+    final opened = await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!opened && mounted) {
+      CommonSnackBar.showError(context, Strings.settingsLinkFailed);
+    }
+  }
 
   Future<void> _signOut() async {
     if (_isBusy) return;
@@ -238,6 +250,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           SettingsSection(
             title: Strings.settingsAboutSection,
             children: [
+              SettingsTile(
+                icon: Icons.privacy_tip_outlined,
+                label: Strings.settingsPrivacyPolicyLabel,
+                onTap: () => _openUrl(Constants.privacyPolicyUrl),
+              ),
+              SettingsTile(
+                icon: Icons.description_outlined,
+                label: Strings.settingsTermsLabel,
+                onTap: () => _openUrl(Constants.termsOfServiceUrl),
+              ),
               SettingsTile(
                 icon: Icons.info_outline,
                 label: Strings.settingsAppNameLabel,
