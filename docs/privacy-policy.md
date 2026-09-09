@@ -4,7 +4,7 @@
 
 Pitakap ("the app") is a personal expense, bills and subscription tracker. This policy explains exactly what the app collects, why, and what you can do about it.
 
-The app is operated by the developer of Pitakap ("we", "us"). Contact: **[ADD A CONTACT EMAIL BEFORE PUBLISHING]**
+The app is operated by the developer of Pitakap ("we", "us"). Contact: **jamagno.27@gmail.com**
 
 ## What we collect
 
@@ -70,4 +70,4 @@ If this policy changes materially, the "Last updated" date above will change and
 
 ## Contact
 
-**[ADD A CONTACT EMAIL BEFORE PUBLISHING]**
+**jamagno.27@gmail.com**

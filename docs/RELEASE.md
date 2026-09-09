@@ -31,9 +31,11 @@ Everything the code can carry is done and verified. What remains needs a human: 
 
 ## 🔴 Blockers — these are yours
 
-### 1. Fill in the contact email in both policy documents
+### 1. ~~Fill in the contact email~~ — ✅ DONE 2026-09-09
 
-Both files contain `[ADD A CONTACT EMAIL BEFORE PUBLISHING]`. Stores reject policies without a contact route. Also **read both documents** — they were drafted from what the code actually collects, but they are legal documents and they are your name on them.
+Both policy documents now carry **`jamagno.27@gmail.com`** — the same address published on the Google sign-in consent screen, so users see one consistent contact.
+
+⚠️ **Still read both documents.** They were drafted from what the code actually collects and are accurate as far as that goes, but they are legal documents published under your name.
 
 ### 2. Generate the upload keystore (Android)
 
@@ -97,7 +99,9 @@ Privacy policy URL for both:
 
 ## ⚠️ Known, deliberate
 
+- **Two GitHub secret-scanning alerts are open** on the Firebase API keys in `lib/firebase_options.dart`. These are **client identifiers, not secrets** — access is controlled by Firestore rules. They cannot be hidden (they ship inside the app binary). The correct handling is to **restrict both keys** in Google Cloud Console to the app package/bundle + SHA-1, then close the alerts as *"Won't fix"*. Do **not** disable secret scanning.
+
 - **Minimum iOS is now 15.0.** Flutter raised it from 13.0 during the first iOS build; iOS 13/14 devices are dropped.
 - **Reminders do not survive a reboot** until the app is next opened — `RECEIVE_BOOT_COMPLETED` was deliberately not declared. Disclosed in the Terms.
 - **The 35-row manual QA matrix has never been run.** Not a store gate, but the app has never been exercised against real Firestore on a device. Row #16 (second-account isolation) is the only real proof the security rules work.
-- **The Google `G` mark** on the sign-in button is a styled letter, not Google's official asset. Google's branding guidelines require the real mark.
+- ~~**The Google `G` mark** is a styled letter~~ — **✅ FIXED 2026-09-09.** Replaced with Google's official four-colour mark, downloaded from `developers.google.com/static/identity/images/g-logo.png` and committed at `assets/branding/google_g_logo.png`. A test asserts the asset renders *and* that the placeholder `Text('G')` never returns.

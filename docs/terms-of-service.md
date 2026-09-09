@@ -4,7 +4,7 @@
 
 By creating an account or using Pitakap ("the app"), you agree to these terms. If you do not agree, do not use the app.
 
-Contact: **[ADD A CONTACT EMAIL BEFORE PUBLISHING]**
+Contact: **jamagno.27@gmail.com**
 
 ## What Pitakap is
 
@@ -59,4 +59,4 @@ These terms are governed by the laws of the Republic of the Philippines, without
 
 ## Contact
 
-**[ADD A CONTACT EMAIL BEFORE PUBLISHING]**
+**jamagno.27@gmail.com**
