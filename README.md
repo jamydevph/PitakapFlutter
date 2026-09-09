@@ -25,16 +25,41 @@ A personal money tracker that puts your complete spending picture in one app: lo
 
 ## Screenshots
 
-Captured on a Pixel 10 Pro emulator. The same screens in both themes — the dark palette is *derived*, not hand-drawn: the brand green `#0E7A5F` is unreadable as text on dark, so dark mode shifts to a lighter tone `#35C79A` with dark text on it, preserving the hue while fixing contrast.
+Captured on a Pixel 10 Pro emulator with seeded sample data.
+
+### The app, in both themes
+
+The dark palette is *derived*, not hand-drawn: the brand green `#0E7A5F` is unreadable as text on dark, so dark mode shifts to a lighter tone `#35C79A` with dark text on it — the hue survives, the contrast is fixed.
 
 | | Light | Dark |
 |---|---|---|
-| **Dashboard** | <img src="docs/screenshots/light-home.png" width="220"> | <img src="docs/screenshots/dark-home.png" width="220"> |
-| **Subscriptions** | <img src="docs/screenshots/light-subs.png" width="220"> | <img src="docs/screenshots/dark-subs.png" width="220"> |
-| **Expenses** | <img src="docs/screenshots/light-expenses.png" width="220"> | <img src="docs/screenshots/dark-expenses.png" width="220"> |
-| **Stats** | <img src="docs/screenshots/light-stats.png" width="220"> | <img src="docs/screenshots/dark-stats.png" width="220"> |
+| **Dashboard** — spent today, monthly and yearly commitments, next payments | <img src="docs/screenshots/light-home.png" width="210"> | <img src="docs/screenshots/dark-home.png" width="210"> |
+| **Subscriptions** — filter chips derived from the data, sorted by next due | <img src="docs/screenshots/light-subs.png" width="210"> | <img src="docs/screenshots/dark-subs.png" width="210"> |
+| **Expenses** — date strip, day total, category icons and payment method | <img src="docs/screenshots/light-expenses.png" width="210"> | <img src="docs/screenshots/dark-expenses.png" width="210"> |
+| **Stats** — category donut with per-slice share, month stepper | <img src="docs/screenshots/light-stats.png" width="210"> | <img src="docs/screenshots/dark-stats.png" width="210"> |
+| **Settings** — currency, reminder lead time, theme, account deletion | <img src="docs/screenshots/light-settings.png" width="210"> | <img src="docs/screenshots/dark-settings.png" width="210"> |
 
-> These show a **new account**, so every screen is in its empty state. That is deliberate here — empty states are their own design surface in this app, and there are two of them per screen where it matters (the Expenses tab says *"Log your first expense for today"* on today and *"You did not record any spending on this day"* on a past day, because telling you to log today's expense while you browse last Tuesday is a lie). Screenshots with populated data are still to come.
+### Detail and entry
+
+| Subscription detail | Add expense | Add subscription |
+|---|---|---|
+| <img src="docs/screenshots/light-subscription-detail.png" width="210"> | <img src="docs/screenshots/light-add-expense.png" width="210"> | <img src="docs/screenshots/light-add-subscription.png" width="210"> |
+| Monthly **and** yearly cost, plus the next three renewals — all computed from `firstBillDate` + `billingCycle`, never stored | Amount autofocuses so logging takes two taps | Category, cycle, first bill date and reminder lead time |
+
+### First run
+
+| Onboarding | | |
+|---|---|---|
+| <img src="docs/screenshots/light-onboarding-1.png" width="210"> | <img src="docs/screenshots/light-onboarding-2.png" width="210"> | <img src="docs/screenshots/light-onboarding-3.png" width="210"> |
+| Track every subscription | Never miss a due date | See where your money goes |
+
+### Authentication
+
+| Sign in | Create account | Reset password |
+|---|---|---|
+| <img src="docs/screenshots/light-login.png" width="210"> | <img src="docs/screenshots/light-signup.png" width="210"> | <img src="docs/screenshots/light-forgot-password.png" width="210"> |
+
+Email/password and Google Sign-In, using Google's official mark. The reset and entry screens autofocus their first field, so the emulator's keyboard toolbar appears in those captures — that autofocus is deliberate, not an artefact.
 
 ## Tech Stack
 
