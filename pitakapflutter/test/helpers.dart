@@ -67,11 +67,14 @@ void registerAuthFallbacks() {
 
 List<Override> authOverrides({
   String? signedInUid,
+  Stream<String?>? authStream,
   AuthRepository? repository,
   UserDetailsEntity? userDetails = testUser,
 }) {
   return [
-    authStateProvider.overrideWith((ref) => Stream.value(signedInUid)),
+    authStateProvider.overrideWith(
+      (ref) => authStream ?? Stream.value(signedInUid),
+    ),
     userDetailsProvider.overrideWith((ref, uid) => Stream.value(userDetails)),
     if (repository != null)
       authRepositoryProvider.overrideWithValue(repository),
@@ -255,6 +258,7 @@ Future<ProviderContainer> pumpAppAt(
   String location, {
   Map<String, Object> values = onboarded,
   String? signedInUid,
+  Stream<String?>? authStream,
   AuthRepository? repository,
   UserDetailsEntity? userDetails = testUser,
   SubscriptionRepository? subscriptionRepository,
@@ -270,6 +274,7 @@ Future<ProviderContainer> pumpAppAt(
       sharedPreferencesProvider.overrideWithValue(prefs),
       ...authOverrides(
         signedInUid: signedInUid,
+        authStream: authStream,
         repository: repository,
         userDetails: userDetails,
       ),

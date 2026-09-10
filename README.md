@@ -8,7 +8,7 @@ A personal money tracker that puts your complete spending picture in one app: lo
 ![Dart](https://img.shields.io/badge/Dart-3.13-0175C2?logo=dart&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%2B%20Firestore-FFCA28?logo=firebase&logoColor=black)
 ![Riverpod](https://img.shields.io/badge/State-Riverpod%203-1C6DD0)
-![Tests](https://img.shields.io/badge/tests-646%20passing-2EA043)
+![Tests](https://img.shields.io/badge/tests-727%20passing-2EA043)
 ![Coverage](https://img.shields.io/badge/coverage-89.3%25-2EA043)
 
 ---
@@ -18,6 +18,8 @@ A personal money tracker that puts your complete spending picture in one app: lo
 - 🔐 **Authentication** — email/password + Google Sign-In, password reset, session restore (Firebase Auth)
 - 💳 **Subscription tracking** — full CRUD with four billing cycles, computed next-due dates, category filter and sort
 - 🧾 **Daily expense logging** — two-tap entry, per-day view with a date strip, optional payment method
+- 👛 **Wallets** — split money across wallets; balances are derived from an opening balance minus assigned spend, and a wallet cannot be overdrawn
+- 🕘 **History** — every expense grouped by wallet in collapsible sections, newest completed date first
 - 📊 **Dashboard & stats** — spent today, monthly/yearly commitments, upcoming payments, category donut chart
 - 🔔 **Due-date reminders** — scheduled local notifications, **no server and no Cloud Functions**
 - 🌙 **Dark mode** — light/dark/system, persisted
@@ -25,7 +27,18 @@ A personal money tracker that puts your complete spending picture in one app: lo
 
 ## Screenshots
 
-Captured on a Pixel 10 Pro emulator with seeded sample data.
+Captured on an Android emulator with seeded sample data: three wallets, five wallet-assigned expenses and eight older unassigned ones.
+
+### Navigation
+
+Navigation is a drawer, not a bottom bar — seven destinations do not fit in five slots, and Wallets and History both needed a home. Every destination reaches it from its own app bar.
+
+| Drawer | Wallets | History |
+|---|---|---|
+| <img src="docs/screenshots/light-drawer.png" width="210"> | <img src="docs/screenshots/light-wallets.png" width="210"> | <img src="docs/screenshots/light-history.png" width="210"> |
+| Expenses and Wallets carry deliberately different icons — a receipt is a record of spending, a wallet is the thing it comes out of. Sign out is pinned to the bottom in the Danger red, and asks before it acts | Balances are *derived*, never stored: ₱5,000 opening − ₱730 assigned = ₱4,270. The same expense can never be deducted twice | Expenses grouped by wallet, newest completed date first. Mint is a wallet group, white an expense, so it never reads as a second Expenses list |
+
+History keeps an **Unassigned** group for expenses logged without a wallet — including any whose wallet was later deleted, so nothing silently disappears from the record.
 
 ### The app, in both themes
 
@@ -33,18 +46,27 @@ The dark palette is *derived*, not hand-drawn: the brand green `#0E7A5F` is unre
 
 | | Light | Dark |
 |---|---|---|
-| **Dashboard** — spent today, monthly and yearly commitments, next payments | <img src="docs/screenshots/light-home.png" width="210"> | <img src="docs/screenshots/dark-home.png" width="210"> |
+| **Dashboard** — spent today, total balance across wallets, monthly and yearly commitments, next payments | <img src="docs/screenshots/light-home.png" width="210"> | <img src="docs/screenshots/dark-home.png" width="210"> |
 | **Subscriptions** — filter chips derived from the data, sorted by next due | <img src="docs/screenshots/light-subs.png" width="210"> | <img src="docs/screenshots/dark-subs.png" width="210"> |
 | **Expenses** — date strip, day total, category icons and payment method | <img src="docs/screenshots/light-expenses.png" width="210"> | <img src="docs/screenshots/dark-expenses.png" width="210"> |
+| **Wallets** — opening balance minus assigned spend, per wallet and in total | <img src="docs/screenshots/light-wallets.png" width="210"> | <img src="docs/screenshots/dark-wallets.png" width="210"> |
+| **History** — collapsible wallet sections, sorted by completed date | <img src="docs/screenshots/light-history.png" width="210"> | <img src="docs/screenshots/dark-history.png" width="210"> |
 | **Stats** — category donut with per-slice share, month stepper | <img src="docs/screenshots/light-stats.png" width="210"> | <img src="docs/screenshots/dark-stats.png" width="210"> |
-| **Settings** — currency, reminder lead time, theme, account deletion | <img src="docs/screenshots/light-settings.png" width="210"> | <img src="docs/screenshots/dark-settings.png" width="210"> |
+| **Settings** — currency, reminder lead time, appearance, account deletion | <img src="docs/screenshots/light-settings.png" width="210"> | <img src="docs/screenshots/dark-settings.png" width="210"> |
+
+On the dashboard the two money cards are deliberately different greens: primary green for what you *spent*, mint for what you *have*. Same hue, opposite meaning, and never mistaken for each other.
 
 ### Detail and entry
 
-| Subscription detail | Add expense | Add subscription |
+| Subscription detail | Add expense | Add wallet |
 |---|---|---|
-| <img src="docs/screenshots/light-subscription-detail.png" width="210"> | <img src="docs/screenshots/light-add-expense.png" width="210"> | <img src="docs/screenshots/light-add-subscription.png" width="210"> |
-| Monthly **and** yearly cost, plus the next three renewals — all computed from `firstBillDate` + `billingCycle`, never stored | Amount autofocuses so logging takes two taps | Category, cycle, first bill date and reminder lead time |
+| <img src="docs/screenshots/light-subscription-detail.png" width="210"> | <img src="docs/screenshots/light-add-expense.png" width="210"> | <img src="docs/screenshots/light-add-wallet.png" width="210"> |
+| Monthly **and** yearly cost, plus the next three renewals — all computed from `firstBillDate` + `billingCycle`, never stored | Amount autofocuses so logging takes two taps; the wallet row appears once a wallet exists, and a wallet cannot be overdrawn | Only the opening balance is persisted — everything else is arithmetic |
+
+| Add subscription | | |
+|---|---|---|
+| <img src="docs/screenshots/light-add-subscription.png" width="210"> | | |
+| Category, cycle, first bill date and reminder lead time | | |
 
 ### First run
 
@@ -76,7 +98,7 @@ Email/password and Google Sign-In, using Google's official mark. The reset and e
 
 ## Architecture
 
-Clean Architecture, applied twice — subscriptions and expenses are structurally identical vertical slices.
+Clean Architecture, applied three times — subscriptions, expenses and wallets are structurally identical vertical slices.
 
 ```
 pitakapflutter/lib/
@@ -84,7 +106,7 @@ pitakapflutter/lib/
 │   ├── common/              themed Common* widgets
 │   ├── error/               sealed Failure + Auth/Firestore error mappers
 │   ├── providers/           DI graph, one file per feature
-│   ├── router/              go_router + MainShell + ReminderBootstrap
+│   ├── router/              go_router + AppDrawer + MainShell + ReminderBootstrap
 │   ├── theme/               AppTheme.light() / .dark() from one builder
 │   ├── usecase/             UseCase<T>, UseCaseWithParams<T, P>
 │   └── utils/               date_utils, currency_format, validators
@@ -92,6 +114,8 @@ pitakapflutter/lib/
     ├── auth/                data · domain · presentation
     ├── subscription/        data · domain · presentation
     ├── expense/             data · domain · presentation
+    ├── wallet/              data · domain · presentation
+    ├── history/             presentation
     ├── dashboard/           domain · presentation
     ├── stats/               domain · presentation
     ├── profile/             presentation  (settings)
@@ -101,7 +125,7 @@ pitakapflutter/lib/
 
 **The dependency rule:** `presentation → domain ← data`. The domain layer imports nothing from the other two, which is what lets it be tested without Firebase at all.
 
-**External services live only in datasources.** Firestore is touched in exactly three files; `flutter_local_notifications` in exactly one. Everything else talks to an abstract repository. Errors surface as sealed `Failure` types, are caught by `AsyncValue.guard` in controllers, and render from sealed state classes — a raw `FirebaseException` never reaches the UI.
+**External services live only in datasources.** Firestore is touched in exactly four datasources; `flutter_local_notifications` in exactly one. Everything else talks to an abstract repository. Errors surface as sealed `Failure` types, are caught by `AsyncValue.guard` in controllers, and render from sealed state classes — a raw `FirebaseException` never reaches the UI.
 
 ### Data model
 
@@ -111,15 +135,21 @@ Flat top-level collections with a `userId` ownership field, queried with `where(
 userDetails/{uid}      firstName · lastName · email · defaultCurrency · createdAt
 subscriptions/{id}     userId · name · category · amount · billingCycle ·
                        firstBillDate · reminderDaysBefore · isActive · …
-expenses/{id}          userId · description · category · amount ·
+expenses/{id}          userId · description · category · amount · walletId ·
                        paymentMethod · date (normalised to midnight local) · …
+wallets/{id}           userId · name · description · openingBalance · currency
 ```
+
+A wallet stores only its **opening balance**. The current balance is always recomputed as
+`openingBalance − Σ(expenses where walletId == wallet.id)`, so the same expense can never be
+deducted twice and no running total can drift out of sync. An expense with an empty `walletId`
+is unassigned: it counts toward spending but against no wallet.
 
 Ownership is enforced server-side in `firestore.rules`. Update rules additionally require `request.resource.data.userId == resource.data.userId`, so a document can never be reassigned to another user.
 
 ## Testing
 
-**646 tests, 89.3% line coverage** — no Firebase emulator, no network, no device. The whole suite runs on `flutter test`.
+**727 tests, 87.8% line coverage** — no Firebase emulator, no network, no device. The whole suite runs on `flutter test`.
 
 ```
 cd pitakapflutter
@@ -129,13 +159,13 @@ flutter test --coverage    # writes coverage/lcov.info
 
 | Layer | Line coverage | Lines |
 |---|---|---|
-| `presentation/` | **96.8%** | 1740 / 1797 |
-| `core/` | **94.7%** | 610 / 644 |
-| `domain/` | **92.7%** | 291 / 314 |
-| `data/` | **52.9%** | 238 / 450 |
-| **Overall** | **89.3%** | 2887 / 3232 |
+| `presentation/` | **94.2%** | 2097 / 2227 |
+| `core/` | **93.9%** | 703 / 749 |
+| `domain/` | **92.8%** | 387 / 417 |
+| `data/` | **52.8%** | 292 / 553 |
+| **Overall** | **87.8%** | 3487 / 3973 |
 
-69 of 106 files are at 100%.
+76 of 127 files are at 100%.
 
 **Why `data/` is the outlier, deliberately.** The uncovered lines are almost entirely the Firestore and platform-channel datasources, plus generated `firebase_options.dart`. Exercising those needs a live Firebase SDK, so instead the *contract* around them is tested: every repository is verified against a mocked datasource, and every error path is asserted to surface as a sealed `Failure` with no platform detail leaking into a user-facing message.
 
@@ -237,8 +267,8 @@ flutter build apk --release          # or --split-per-abi for smaller artifacts
 PitakapFlutter/
 ├── README.md              this file
 └── pitakapflutter/        the Flutter app
-    ├── lib/               113 Dart files
-    ├── test/              47 test files
+    ├── lib/               135 Dart files
+    ├── test/              53 test files
     ├── firestore.rules
     └── firestore.indexes.json
 ```

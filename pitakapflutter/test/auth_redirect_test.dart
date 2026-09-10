@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -6,6 +8,7 @@ import 'package:pitakapflutter/core/error/failure.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
 import 'package:pitakapflutter/core/router/main_shell.dart';
+import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/feature/auth/presentation/forgot_password/forgot_password_page.dart';
 import 'package:pitakapflutter/feature/auth/presentation/login/login_page.dart';
 import 'package:pitakapflutter/feature/auth/presentation/sign_up/sign_up_page.dart';
@@ -174,6 +177,154 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('No internet connection'), findsOneWidget);
+    });
+  });
+
+  group('sign out from the drawer', () {
+    Future<MockAuthRepository> openDrawerAt(
+      WidgetTester tester, {
+      Object? failure,
+    }) async {
+      final repository = MockAuthRepository();
+      if (failure == null) {
+        when(() => repository.signOut()).thenAnswer((_) async {});
+      } else {
+        when(() => repository.signOut()).thenThrow(failure);
+      }
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.dashboard,
+        signedInUid: 'uid-1',
+        repository: repository,
+      );
+      await openDrawer(tester);
+
+      return repository;
+    }
+
+    testWidgets('the drawer offers a sign out button', (tester) async {
+      await openDrawerAt(tester);
+
+      expect(
+        find.widgetWithText(FilledButton, Strings.signOutAction),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the button carries the danger colour', (tester) async {
+      await openDrawerAt(tester);
+
+      final button = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, Strings.signOutAction),
+      );
+
+      expect(
+        button.style?.backgroundColor?.resolve(<WidgetState>{}),
+        AppColors.danger,
+      );
+    });
+
+    testWidgets('it confirms first — one tap does not sign you out', (
+      tester,
+    ) async {
+      final repository = await openDrawerAt(tester);
+
+      await tester.tap(
+        find.widgetWithText(FilledButton, Strings.signOutAction),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.signOutTitle), findsOneWidget);
+      verifyNever(() => repository.signOut());
+    });
+
+    testWidgets('cancelling the confirmation keeps you signed in', (
+      tester,
+    ) async {
+      final repository = await openDrawerAt(tester);
+
+      await tester.tap(
+        find.widgetWithText(FilledButton, Strings.signOutAction),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(Strings.cancelAction));
+      await tester.pumpAndSettle();
+
+      verifyNever(() => repository.signOut());
+      expect(find.byType(MainShell), findsOneWidget);
+    });
+
+    testWidgets('confirming calls the repository', (tester) async {
+      final repository = await openDrawerAt(tester);
+
+      await tester.tap(
+        find.widgetWithText(FilledButton, Strings.signOutAction),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(TextButton, Strings.signOutAction),
+      );
+      await tester.pumpAndSettle();
+
+      verify(() => repository.signOut()).called(1);
+    });
+
+    testWidgets('a successful sign out lands you back on login', (
+      tester,
+    ) async {
+      // The drawer deliberately does not navigate: it relies on the auth
+      // stream flipping and the router's redirect doing the work.
+      final auth = StreamController<String?>();
+      addTearDown(auth.close);
+      auth.add('uid-1');
+
+      final repository = MockAuthRepository();
+      when(() => repository.signOut()).thenAnswer((_) async {
+        auth.add(null);
+      });
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.dashboard,
+        signedInUid: 'uid-1',
+        authStream: auth.stream,
+        repository: repository,
+      );
+      await openDrawer(tester);
+
+      await tester.tap(
+        find.widgetWithText(FilledButton, Strings.signOutAction),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(TextButton, Strings.signOutAction),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LoginPage), findsOneWidget);
+      expect(find.byType(MainShell), findsNothing);
+    });
+
+    testWidgets('a failing sign out shows an error and stays put', (
+      tester,
+    ) async {
+      await openDrawerAt(
+        tester,
+        failure: const NetworkFailure('No internet connection'),
+      );
+
+      await tester.tap(
+        find.widgetWithText(FilledButton, Strings.signOutAction),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(TextButton, Strings.signOutAction),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('No internet connection'), findsOneWidget);
+      expect(find.byType(MainShell), findsOneWidget);
     });
   });
 }
