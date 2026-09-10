@@ -2,8 +2,11 @@ class Keys {
   static const String userDetailsCollection = 'userDetails';
   static const String subscriptionsCollection = 'subscriptions';
   static const String expensesCollection = 'expenses';
+  static const String walletsCollection = 'wallets';
 
   static const String userId = 'userId';
+  static const String walletId = 'walletId';
+  static const String openingBalance = 'openingBalance';
   static const String firstName = 'firstName';
   static const String lastName = 'lastName';
   static const String email = 'email';

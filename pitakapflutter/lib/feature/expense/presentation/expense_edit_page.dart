@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pitakapflutter/core/common/common.dart';
 import 'package:pitakapflutter/core/providers/auth_providers.dart';
+import 'package:pitakapflutter/core/providers/expense_providers.dart';
 import 'package:pitakapflutter/core/providers/settings_providers.dart';
+import 'package:pitakapflutter/core/providers/wallet_providers.dart';
 import 'package:pitakapflutter/core/resources/constants.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
@@ -19,6 +21,8 @@ import 'package:pitakapflutter/feature/expense/presentation/providers/expense_ed
 import 'package:pitakapflutter/feature/expense/presentation/providers/expense_edit_state.dart';
 import 'package:pitakapflutter/feature/expense/presentation/providers/selected_day_controller.dart';
 import 'package:pitakapflutter/feature/expense/presentation/widgets/expense_day_total_card.dart';
+import 'package:pitakapflutter/feature/wallet/domain/entities/wallet_entity.dart';
+import 'package:pitakapflutter/feature/wallet/domain/wallet_balances.dart';
 
 class ExpenseEditPage extends ConsumerStatefulWidget {
   final ExpenseEntity? expense;
@@ -38,6 +42,7 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
 
   late String _category;
   late String _paymentMethod;
+  late String _walletId;
   late DateTime _date;
 
   bool get _isEditing => widget.expense != null;
@@ -56,6 +61,7 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
     );
     _category = existing?.category ?? Constants.expenseCategories.first;
     _paymentMethod = existing?.paymentMethod ?? '';
+    _walletId = existing?.walletId ?? '';
     _date = existing?.date ?? ref.read(selectedDayProvider);
   }
 
@@ -89,7 +95,36 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
     context.go(AppRoutes.expenses);
   }
 
-  void _save(String userId) {
+  /// A wallet may not be overdrawn. The wallet being edited is excluded from
+  /// its own balance so raising an amount is judged against the new figure,
+  /// not the old one counted twice.
+  ///
+  /// Both lists are watched in [build] rather than read here: a `ref.read` on
+  /// a provider nothing is listening to comes back still loading, which would
+  /// silently wave every overdraft through.
+  bool _fits(
+    List<WalletEntity> wallets,
+    List<ExpenseEntity> expenses,
+    double amount,
+  ) {
+    if (_walletId.isEmpty) return true;
+
+    final wallet = wallets.where((item) => item.id == _walletId).firstOrNull;
+    if (wallet == null) return true;
+
+    return canAfford(
+      wallet: wallet,
+      expenses: expenses,
+      editingExpenseId: widget.expense?.id ?? '',
+      newAmount: amount,
+    );
+  }
+
+  void _save(
+    String userId,
+    List<WalletEntity> wallets,
+    List<ExpenseEntity> expenses,
+  ) {
     FocusScope.of(context).unfocus();
 
     if (_formKey.currentState?.validate() != true) return;
@@ -98,6 +133,11 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
     final description = _descriptionController.text.trim();
     final controller = ref.read(expenseEditControllerProvider.notifier);
     final existing = widget.expense;
+
+    if (!_fits(wallets, expenses, amount)) {
+      CommonSnackBar.showError(context, Strings.expenseWalletInsufficient);
+      return;
+    }
 
     if (existing == null) {
       controller.create(
@@ -109,6 +149,7 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
           date: _date,
           currency: ref.read(defaultCurrencyProvider),
           paymentMethod: _paymentMethod,
+          walletId: _walletId,
         ),
       );
       return;
@@ -123,6 +164,7 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
         amount: amount,
         currency: existing.currency,
         paymentMethod: _paymentMethod,
+        walletId: _walletId,
         date: _date,
         createdAt: existing.createdAt,
         updatedAt: existing.updatedAt,
@@ -139,6 +181,14 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
     final String currencyCode =
         widget.expense?.currency ?? ref.watch(defaultCurrencyProvider);
     final today = startOfDay(DateTime.now());
+    final wallets = userId == null
+        ? const <WalletEntity>[]
+        : ref.watch(walletsStreamProvider(userId)).value ??
+              const <WalletEntity>[];
+    final walletExpenses = userId == null
+        ? const <ExpenseEntity>[]
+        : ref.watch(allExpensesStreamProvider(userId)).value ??
+              const <ExpenseEntity>[];
 
     ref.listen(expenseEditControllerProvider, (previous, next) {
       final state = next.value;
@@ -245,6 +295,21 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
                             : value,
                       ),
                     ),
+                    if (wallets.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.lg),
+                      _SectionLabel(Strings.expenseWalletLabel),
+                      _ChoiceChips<String>(
+                        values: [
+                          '',
+                          for (final wallet in wallets) wallet.id,
+                        ],
+                        selected: _walletId,
+                        labelOf: (id) => _walletNameFor(wallets, id),
+                        enabled: !isBusy,
+                        onSelected: (value) =>
+                            setState(() => _walletId = value),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -253,7 +318,9 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: CommonPrimaryButton(
                 label: Strings.expenseSaveAction,
-                onPressed: userId == null ? null : () => _save(userId),
+                onPressed: userId == null
+                    ? null
+                    : () => _save(userId, wallets, walletExpenses),
                 isLoading: isBusy,
               ),
             ),
@@ -262,6 +329,12 @@ class _ExpenseEditPageState extends ConsumerState<ExpenseEditPage> {
       ),
     );
   }
+}
+
+String _walletNameFor(List<WalletEntity> wallets, String id) {
+  if (id.isEmpty) return Strings.expenseWalletNone;
+
+  return wallets.where((wallet) => wallet.id == id).firstOrNull?.name ?? id;
 }
 
 class _AmountCard extends StatelessWidget {

@@ -10,6 +10,8 @@ import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_fo
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
 
 abstract interface class ExpenseRemoteDatasource {
+  Stream<List<ExpenseModel>> watchAllExpenses(String userId);
+
   Stream<List<ExpenseModel>> watchExpensesForDay(
     WatchExpensesForDayParams params,
   );
@@ -34,6 +36,15 @@ class ExpenseRemoteDatasourceImpl implements ExpenseRemoteDatasource {
 
   CollectionReference<Map<String, dynamic>> get _collection {
     return firestore.collection(Keys.expensesCollection);
+  }
+
+  @override
+  Stream<List<ExpenseModel>> watchAllExpenses(String userId) {
+    return _collection
+        .where(Keys.userId, isEqualTo: userId)
+        .snapshots()
+        .map(_toSortedModels)
+        .handleError((Object error) => throw FirestoreErrorMapper.from(error));
   }
 
   @override
@@ -76,6 +87,7 @@ class ExpenseRemoteDatasourceImpl implements ExpenseRemoteDatasource {
         date: params.date,
         currency: params.currency,
         paymentMethod: params.paymentMethod,
+        walletId: params.walletId,
       );
 
       await _collection.add(model.toCreateMap());

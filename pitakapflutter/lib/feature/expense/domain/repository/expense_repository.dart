@@ -7,6 +7,8 @@ import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_fo
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
 
 abstract interface class ExpenseRepository {
+  Stream<List<ExpenseEntity>> watchAllExpenses(String userId);
+
   Stream<List<ExpenseEntity>> watchExpensesForDay(
     WatchExpensesForDayParams params,
   );

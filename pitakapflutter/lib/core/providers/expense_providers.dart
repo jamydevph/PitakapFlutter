@@ -8,6 +8,7 @@ import 'package:pitakapflutter/feature/expense/domain/usecases/create_expense_us
 import 'package:pitakapflutter/feature/expense/domain/usecases/delete_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/restore_expense_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_usecase.dart';
+import 'package:pitakapflutter/feature/expense/domain/usecases/watch_all_expenses_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
 
@@ -18,6 +19,15 @@ final expenseRemoteDatasourceProvider = Provider<ExpenseRemoteDatasource>(
 final expenseRepositoryProvider = Provider<ExpenseRepository>(
   (ref) => ExpenseRepositoryImpl(ref.watch(expenseRemoteDatasourceProvider)),
 );
+
+final watchAllExpensesUseCaseProvider = Provider<WatchAllExpensesUseCase>(
+  (ref) => WatchAllExpensesUseCase(ref.watch(expenseRepositoryProvider)),
+);
+
+final allExpensesStreamProvider =
+    StreamProvider.family<List<ExpenseEntity>, String>(
+      (ref, userId) => ref.watch(watchAllExpensesUseCaseProvider).call(userId),
+    );
 
 final watchExpensesForDayUseCaseProvider = Provider<WatchExpensesForDayUseCase>(
   (ref) => WatchExpensesForDayUseCase(ref.watch(expenseRepositoryProvider)),

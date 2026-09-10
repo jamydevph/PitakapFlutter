@@ -32,6 +32,11 @@ class MonthExpenseRepository implements ExpenseRepository {
   MonthExpenseRepository({this.byMonth = const {}, this.error});
 
   @override
+  Stream<List<ExpenseEntity>> watchAllExpenses(String userId) {
+    return Stream.value(const []);
+  }
+
+  @override
   Stream<List<ExpenseEntity>> watchExpensesForDay(
     WatchExpensesForDayParams params,
   ) {

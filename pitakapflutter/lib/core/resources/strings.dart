@@ -58,10 +58,13 @@ class Strings {
       'day by day.';
 
   static const String navDashboard = 'Home';
-  static const String navSubscriptions = 'Subs';
+  static const String navSubscriptions = 'Subscriptions';
   static const String navExpenses = 'Expenses';
   static const String navStats = 'Stats';
   static const String navSettings = 'Settings';
+  static const String navWallets = 'Wallets';
+  static const String navHistory = 'History';
+  static const String navMenuTooltip = 'Open menu';
 
   static const String greetingMorning = 'Good morning,';
   static const String greetingAfternoon = 'Good afternoon,';
@@ -233,4 +236,49 @@ class Strings {
 
   static const String genericError = 'Something went wrong. Please try again.';
   static const String networkError = 'No internet connection';
+
+  static const String walletsTitle = 'Wallets';
+  static const String walletsLoadFailed = 'Could not load your wallets';
+  static const String walletsEmptyTitle = 'No wallets yet';
+  static const String walletsEmptyMessage =
+      'Add a wallet to track where your money actually sits.';
+  static const String walletAddAction = 'Add Wallet';
+  static const String walletAddTitle = 'Add wallet';
+  static const String walletEditTitle = 'Edit wallet';
+  static const String walletSaveAction = 'Save wallet';
+  static const String walletNameLabel = 'Wallet name';
+  static const String walletNameHint = 'e.g. Main Wallet';
+  static const String walletNameRequired = 'Wallet name is required';
+  static const String walletDescriptionLabel = 'Description (optional)';
+  static const String walletDescriptionHint = 'e.g. Everyday spending';
+  static const String walletOpeningBalanceLabel = 'Initial balance';
+  static const String walletOpeningBalanceHelp =
+      'Assigned expenses are deducted from this balance.';
+  static const String walletCreated = 'Wallet added';
+  static const String walletUpdated = 'Wallet updated';
+  static const String walletDeleted = 'Wallet deleted';
+  static const String walletDeleteTitle = 'Delete wallet?';
+  static const String walletDeleteMessage =
+      'Expenses assigned to this wallet stay logged, but they will no longer '
+      'be counted against any balance.';
+  static const String walletDeleteAction = 'Delete';
+  static const String totalBalanceLabel = 'TOTAL BALANCE';
+  static const String walletsCountSuffix = 'wallets';
+  static const String walletCountSuffix = 'wallet';
+
+  static const String historyTitle = 'History';
+  static const String historyLoadFailed = 'Could not load your history';
+  static const String historyEmptyTitle = 'Nothing to show yet';
+  static const String historyEmptyMessage =
+      'Log an expense and it will appear here, grouped by wallet.';
+  static const String historyTapToExpand = 'tap to expand';
+  static const String historyExpenseSuffix = 'expense';
+  static const String historyExpensesSuffix = 'expenses';
+  static const String historyUnassignedTitle = 'Unassigned';
+  static const String historyUnassignedDescription = 'No wallet chosen';
+
+  static const String expenseWalletLabel = 'Wallet';
+  static const String expenseWalletNone = 'No wallet';
+  static const String expenseWalletInsufficient =
+      'That leaves this wallet short. Lower the amount or pick another wallet.';
 }

@@ -14,6 +14,7 @@ class ExpenseModel extends ExpenseEntity {
     required super.date,
     super.currency,
     super.paymentMethod,
+    super.walletId,
     super.createdAt,
     super.updatedAt,
   });
@@ -28,6 +29,7 @@ class ExpenseModel extends ExpenseEntity {
       date: entity.date,
       currency: entity.currency,
       paymentMethod: entity.paymentMethod,
+      walletId: entity.walletId,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );
@@ -48,6 +50,7 @@ class ExpenseModel extends ExpenseEntity {
       amount: (map[Keys.amount] as num?)?.toDouble() ?? 0,
       currency: map[Keys.currency] as String? ?? Constants.defaultCurrency,
       paymentMethod: map[Keys.paymentMethod] as String? ?? '',
+      walletId: map[Keys.walletId] as String? ?? '',
       date: (map[Keys.date] as Timestamp?)?.toDate() ?? DateTime(1970),
       createdAt: (map[Keys.createdAt] as Timestamp?)?.toDate(),
       updatedAt: (map[Keys.updatedAt] as Timestamp?)?.toDate(),
@@ -81,6 +84,7 @@ class ExpenseModel extends ExpenseEntity {
     Keys.amount: amount,
     Keys.currency: currency,
     Keys.paymentMethod: paymentMethod,
+    Keys.walletId: walletId,
     Keys.date: Timestamp.fromDate(startOfDay(date)),
   };
 }

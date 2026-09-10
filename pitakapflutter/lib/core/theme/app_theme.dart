@@ -15,6 +15,11 @@ class AppColors {
   static const Color ink = Color(0xFF101828);
   static const Color inkSub = Color(0xFF667085);
 
+  static const Color onPrimary = Color(0xFFD1F0E5);
+  static const Color onPrimarySub = Color(0xFFA7DECD);
+  static const Color onMint = Color(0xFF0A5C48);
+  static const Color onMintSub = Color(0xFF0E7A5F);
+
   static const Color danger = Color(0xFFE5484D);
   static const Color dangerText = Color(0xFFB42318);
   static const Color divider = Color(0xFFEAECF0);
@@ -324,6 +329,35 @@ class AppTheme {
           (states) => IconThemeData(
             size: 24,
             color: states.contains(WidgetState.selected) ? primary : inkSub,
+          ),
+        ),
+      ),
+      drawerTheme: DrawerThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        width: 300,
+        shape: const RoundedRectangleBorder(),
+      ),
+      navigationDrawerTheme: NavigationDrawerThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        indicatorColor: primaryContainer,
+        indicatorShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.tile),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? style(15, FontWeight.w600, color: onPrimaryContainer)
+              : style(15, FontWeight.w500, color: ink),
+        ),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            size: 22,
+            color: states.contains(WidgetState.selected)
+                ? onPrimaryContainer
+                : ink,
           ),
         ),
       ),

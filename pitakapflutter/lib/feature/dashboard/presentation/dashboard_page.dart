@@ -8,7 +8,9 @@ import 'package:pitakapflutter/core/providers/auth_providers.dart';
 import 'package:pitakapflutter/core/providers/dashboard_providers.dart';
 import 'package:pitakapflutter/core/providers/expense_providers.dart';
 import 'package:pitakapflutter/core/providers/subscription_providers.dart';
+import 'package:pitakapflutter/core/providers/wallet_providers.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
+import 'package:pitakapflutter/core/router/app_drawer.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/core/utils/date_utils.dart';
@@ -17,6 +19,8 @@ import 'package:pitakapflutter/feature/dashboard/domain/entities/spending_summar
 import 'package:pitakapflutter/feature/dashboard/domain/usecases/get_spending_summary_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/widgets/subscription_tile.dart';
+import 'package:pitakapflutter/feature/wallet/domain/entities/wallet_entity.dart';
+import 'package:pitakapflutter/feature/wallet/domain/wallet_balances.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -35,7 +39,11 @@ class DashboardPage extends ConsumerWidget {
     final userId = ref.watch(authStateProvider).value;
 
     if (userId == null) {
-      return const Scaffold(body: CommonLoader.page());
+      return const Scaffold(
+        appBar: _DashboardAppBar(),
+        drawer: AppDrawer(),
+        body: CommonLoader.page(),
+      );
     }
 
     final now = DateTime.now();
@@ -53,6 +61,8 @@ class DashboardPage extends ConsumerWidget {
 
     if (error != null) {
       return Scaffold(
+        appBar: const _DashboardAppBar(),
+        drawer: const AppDrawer(),
         body: SafeArea(
           child: CommonEmptyState(
             icon: Icons.cloud_off_outlined,
@@ -64,7 +74,11 @@ class DashboardPage extends ConsumerWidget {
     }
 
     if (subscriptions.isLoading || expenses.isLoading) {
-      return const Scaffold(body: CommonLoader.page());
+      return const Scaffold(
+        appBar: _DashboardAppBar(),
+        drawer: AppDrawer(),
+        body: CommonLoader.page(),
+      );
     }
 
     final summary = ref
@@ -78,6 +92,8 @@ class DashboardPage extends ConsumerWidget {
         );
 
     return Scaffold(
+      appBar: const _DashboardAppBar(),
+      drawer: const AppDrawer(),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(
@@ -91,6 +107,7 @@ class DashboardPage extends ConsumerWidget {
             const SizedBox(height: AppSpacing.md),
             _SpentTodayCard(summary: summary, now: now),
             const SizedBox(height: AppSpacing.md),
+            _TotalBalanceCard(userId: userId),
             Row(
               children: [
                 Expanded(
@@ -121,6 +138,18 @@ class DashboardPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// The dashboard leads with a greeting rather than a title, so its app bar
+/// exists only to host the drawer button.
+class _DashboardAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _DashboardAppBar();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) => AppBar(toolbarHeight: kToolbarHeight);
 }
 
 class _Greeting extends StatelessWidget {
@@ -198,6 +227,113 @@ class _SpentTodayCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Mint against the primary-green "spent today" card above it: money you have
+/// versus money you spent. Wallets failing to load must not take the dashboard
+/// down with them, so this collapses to nothing instead of erroring.
+class _TotalBalanceCard extends ConsumerWidget {
+  final String userId;
+
+  const _TotalBalanceCard({required this.userId});
+
+  static String walletCountLabel(int count) {
+    final suffix = count == 1
+        ? Strings.walletCountSuffix
+        : Strings.walletsCountSuffix;
+
+    return '$count $suffix';
+  }
+
+  static String breakdownOf(
+    List<WalletEntity> wallets,
+    Map<String, double> balances,
+  ) {
+    return wallets
+        .map(
+          (wallet) =>
+              '${wallet.name} '
+              '${formatCurrency(balances[wallet.id] ?? 0, currencyCode: wallet.currency, decimalDigits: 0)}',
+        )
+        .join(' · ');
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final wallets = ref.watch(walletsStreamProvider(userId)).value;
+    final expenses = ref.watch(allExpensesStreamProvider(userId)).value;
+
+    if (wallets == null || expenses == null || wallets.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final balances = balancesByWallet(wallets, expenses);
+    final total = totalAvailable(wallets, expenses);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(AppRadius.card),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.account_balance_wallet_outlined,
+                      size: 16,
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(
+                      Strings.totalBalanceLabel,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colorScheme.onPrimaryContainer,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  walletCountLabel(wallets.length),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              formatCurrency(total, currencyCode: wallets.first.currency),
+              style: theme.textTheme.displaySmall?.copyWith(
+                color: colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              breakdownOf(wallets, balances),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onPrimaryContainer,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -7,6 +7,8 @@ import 'package:pitakapflutter/core/providers/onboarding_providers.dart';
 import 'package:pitakapflutter/core/providers/settings_providers.dart';
 import 'package:pitakapflutter/core/resources/keys.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
+import 'package:pitakapflutter/core/router/app_drawer.dart';
+import 'package:pitakapflutter/core/router/main_shell.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/feature/auth/presentation/login/login_page.dart';
 import 'package:pitakapflutter/feature/onboarding/presentation/onboarding_page.dart';
@@ -102,7 +104,7 @@ void main() {
 
       expect(find.text(Strings.appName), findsOneWidget);
       expect(find.text(Strings.appTagline), findsOneWidget);
-      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byType(MainShell), findsNothing);
 
       await pumpPastSplash(tester);
     });
@@ -112,7 +114,7 @@ void main() {
       await pumpPastSplash(tester);
 
       expect(find.byType(LoginPage), findsOneWidget);
-      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byType(MainShell), findsNothing);
     });
 
     testWidgets('splash routes a signed in user into the shell', (
@@ -123,31 +125,66 @@ void main() {
       );
       await pumpPastSplash(tester);
 
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.byType(MainShell), findsOneWidget);
       expect(find.text(Strings.subsPerMonthLabel), findsWidgets);
       expect(find.text(Strings.appTagline), findsNothing);
     });
 
-    testWidgets('bottom navigation reaches every tab', (tester) async {
+    testWidgets('the drawer reaches every destination', (tester) async {
       await tester.pumpWidget(
         await appWith(onboarded, signedInUid: 'uid-1'),
       );
       await pumpPastSplash(tester);
 
-      final tabs = <IconData, String>{
-        Icons.autorenew_outlined: Strings.subscriptionsTitle,
-        Icons.account_balance_wallet_outlined: Strings.expensesTitle,
-        Icons.pie_chart_outline: Strings.statsTitle,
-        Icons.settings_outlined: Strings.settingsTitle,
-        Icons.home_outlined: Strings.subsPerMonthLabel,
+      final destinations = <String, String>{
+        Strings.navSubscriptions: Strings.subscriptionsTitle,
+        Strings.navExpenses: Strings.expensesTitle,
+        Strings.navHistory: Strings.historyTitle,
+        Strings.navStats: Strings.statsTitle,
+        Strings.navWallets: Strings.walletsTitle,
+        Strings.navSettings: Strings.settingsTitle,
+        Strings.navDashboard: Strings.subsPerMonthLabel,
       };
 
-      for (final tab in tabs.entries) {
-        await tester.tap(find.byIcon(tab.key));
-        await tester.pumpAndSettle();
+      for (final destination in destinations.entries) {
+        await openDrawer(tester);
+        await tapDrawerDestination(tester, destination.key);
 
-        expect(find.text(tab.value), findsWidgets);
+        expect(
+          find.text(destination.value),
+          findsWidgets,
+          reason: destination.key,
+        );
       }
+    });
+
+    testWidgets('every destination is reachable from the drawer', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        await appWith(onboarded, signedInUid: 'uid-1'),
+      );
+      await pumpPastSplash(tester);
+      await openDrawer(tester);
+
+      for (final destination in AppDrawer.destinations) {
+        expect(
+          find.descendant(
+            of: find.byType(NavigationDrawer),
+            matching: find.text(destination.label),
+          ),
+          findsOneWidget,
+          reason: destination.route,
+        );
+      }
+    });
+
+    testWidgets('Expenses and Wallets do not share an icon', (tester) async {
+      final icons = AppDrawer.destinations
+          .map((destination) => destination.icon)
+          .toList();
+
+      expect(icons.toSet(), hasLength(icons.length));
     });
 
     testWidgets('a visited tab stays alive off screen', (tester) async {
@@ -161,12 +198,12 @@ void main() {
         findsNothing,
       );
 
-      await tester.tap(find.byIcon(Icons.pie_chart_outline));
-      await tester.pumpAndSettle();
+      await openDrawer(tester);
+      await tapDrawerDestination(tester, Strings.navStats);
       expect(find.text(Strings.statsTitle), findsWidgets);
 
-      await tester.tap(find.byIcon(Icons.home_outlined));
-      await tester.pumpAndSettle();
+      await openDrawer(tester);
+      await tapDrawerDestination(tester, Strings.navDashboard);
 
       expect(find.text(Strings.subsPerMonthLabel), findsWidgets);
       expect(find.text(Strings.statsTitle), findsNothing);
@@ -185,7 +222,7 @@ void main() {
       );
       await pumpPastSplash(tester);
 
-      final context = tester.element(find.byType(NavigationBar));
+      final context = tester.element(find.byType(MainShell));
       expect(Theme.of(context).brightness, Brightness.dark);
     });
   });
@@ -230,7 +267,7 @@ void main() {
 
       expect(find.text(Strings.onboardingSubscriptionsTitle), findsOneWidget);
       expect(find.text(Strings.onboardingNext), findsOneWidget);
-      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byType(MainShell), findsNothing);
     });
 
     testWidgets('advancing through every slide reveals the final call to '
@@ -263,7 +300,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(LoginPage), findsOneWidget);
-      expect(find.byType(NavigationBar), findsNothing);
+      expect(find.byType(MainShell), findsNothing);
 
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getBool(Keys.prefsOnboardingSeen), isTrue);

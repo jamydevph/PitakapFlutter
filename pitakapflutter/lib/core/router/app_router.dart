@@ -11,6 +11,7 @@ import 'package:pitakapflutter/feature/dashboard/presentation/dashboard_page.dar
 import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.dart';
 import 'package:pitakapflutter/feature/expense/presentation/expense_edit_page.dart';
 import 'package:pitakapflutter/feature/expense/presentation/expenses_page.dart';
+import 'package:pitakapflutter/feature/history/presentation/history_page.dart';
 import 'package:pitakapflutter/feature/onboarding/presentation/onboarding_page.dart';
 import 'package:pitakapflutter/feature/profile/presentation/settings_page.dart';
 import 'package:pitakapflutter/feature/splash/presentation/splash_page.dart';
@@ -19,6 +20,9 @@ import 'package:pitakapflutter/feature/subscription/domain/entities/subscription
 import 'package:pitakapflutter/feature/subscription/presentation/subscription_detail_page.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/subscription_edit_page.dart';
 import 'package:pitakapflutter/feature/subscription/presentation/subscriptions_list_page.dart';
+import 'package:pitakapflutter/feature/wallet/domain/entities/wallet_entity.dart';
+import 'package:pitakapflutter/feature/wallet/presentation/wallet_edit_page.dart';
+import 'package:pitakapflutter/feature/wallet/presentation/wallets_page.dart';
 
 StatefulShellBranch _branch(String path, Widget page) {
   return StatefulShellBranch(
@@ -97,6 +101,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             ExpenseEditPage(expense: state.extra as ExpenseEntity?),
       ),
+      GoRoute(
+        path: AppRoutes.walletNew,
+        builder: (context, state) =>
+            WalletEditPage(wallet: state.extra as WalletEntity?),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             MainShell(navigationShell: navigationShell),
@@ -106,6 +115,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           _branch(AppRoutes.expenses, const ExpensesPage()),
           _branch(AppRoutes.stats, const StatsPage()),
           _branch(AppRoutes.settings, const SettingsPage()),
+          _branch(AppRoutes.wallets, const WalletsPage()),
+          _branch(AppRoutes.history, const HistoryPage()),
         ],
       ),
     ],

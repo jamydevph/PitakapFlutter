@@ -24,5 +24,15 @@ service cloud.firestore {
                     && request.auth.uid == resource.data.userId
                     && request.resource.data.userId == resource.data.userId;
     }
+
+    match /wallets/{walletId} {
+      allow create: if request.auth != null
+                    && request.auth.uid == request.resource.data.userId;
+      allow read, delete: if request.auth != null
+                    && request.auth.uid == resource.data.userId;
+      allow update: if request.auth != null
+                    && request.auth.uid == resource.data.userId
+                    && request.resource.data.userId == resource.data.userId;
+    }
   }
 }

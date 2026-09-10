@@ -10,6 +10,7 @@ class CreateExpenseUseCaseParams {
   final DateTime date;
   final String currency;
   final String paymentMethod;
+  final String walletId;
 
   const CreateExpenseUseCaseParams({
     required this.userId,
@@ -19,6 +20,7 @@ class CreateExpenseUseCaseParams {
     required this.date,
     this.currency = Constants.defaultCurrency,
     this.paymentMethod = '',
+    this.walletId = '',
   });
 }
 

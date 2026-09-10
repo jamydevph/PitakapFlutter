@@ -26,6 +26,11 @@ class GatedExpenseRepository implements ExpenseRepository {
   GatedExpenseRepository({this.error});
 
   @override
+  Stream<List<ExpenseEntity>> watchAllExpenses(String userId) {
+    return Stream.value(const []);
+  }
+
+  @override
   Stream<List<ExpenseEntity>> watchExpensesForDay(
     WatchExpensesForDayParams params,
   ) {

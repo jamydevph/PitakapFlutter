@@ -19,4 +19,8 @@ abstract final class AppRoutes {
   static const String expenses = '/expenses';
   static const String stats = '/stats';
   static const String settings = '/settings';
+  static const String wallets = '/wallets';
+  static const String history = '/history';
+
+  static const String walletNew = '/wallet/new';
 }

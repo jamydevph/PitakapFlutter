@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:pitakapflutter/core/error/failure.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
+import 'package:pitakapflutter/core/router/main_shell.dart';
 import 'package:pitakapflutter/feature/auth/presentation/forgot_password/forgot_password_page.dart';
 import 'package:pitakapflutter/feature/auth/presentation/login/login_page.dart';
 import 'package:pitakapflutter/feature/auth/presentation/sign_up/sign_up_page.dart';
@@ -21,6 +22,8 @@ void main() {
       AppRoutes.expenses,
       AppRoutes.stats,
       AppRoutes.settings,
+      AppRoutes.wallets,
+      AppRoutes.history,
     ];
 
     testWidgets('every protected route redirects to login', (tester) async {
@@ -28,7 +31,7 @@ void main() {
         await pumpAppAt(tester, route);
 
         expect(find.byType(LoginPage), findsOneWidget, reason: route);
-        expect(find.byType(NavigationBar), findsNothing, reason: route);
+        expect(find.byType(MainShell), findsNothing, reason: route);
       }
     });
 
@@ -52,7 +55,7 @@ void main() {
         signedInUid: 'uid-1',
       );
 
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.byType(MainShell), findsOneWidget);
       expect(find.text(Strings.subscriptionsTitle), findsWidgets);
     });
 
@@ -66,7 +69,7 @@ void main() {
 
         expect(find.byType(LoginPage), findsNothing, reason: route);
         expect(find.byType(SignUpPage), findsNothing, reason: route);
-        expect(find.byType(NavigationBar), findsOneWidget, reason: route);
+        expect(find.byType(MainShell), findsOneWidget, reason: route);
       }
     });
 
@@ -78,7 +81,7 @@ void main() {
         signedInUid: 'uid-1',
       );
 
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.byType(MainShell), findsOneWidget);
     });
   });
 

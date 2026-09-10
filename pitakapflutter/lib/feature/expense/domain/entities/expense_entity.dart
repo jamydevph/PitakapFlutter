@@ -9,6 +9,7 @@ class ExpenseEntity {
   final double amount;
   final String currency;
   final String paymentMethod;
+  final String walletId;
   final DateTime date;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -22,6 +23,7 @@ class ExpenseEntity {
     required this.date,
     this.currency = Constants.defaultCurrency,
     this.paymentMethod = '',
+    this.walletId = '',
     this.createdAt,
     this.updatedAt,
   });
@@ -29,6 +31,8 @@ class ExpenseEntity {
   DateTime get day => startOfDay(date);
 
   bool get hasPaymentMethod => paymentMethod.isNotEmpty;
+
+  bool get hasWallet => walletId.isNotEmpty;
 
   bool belongsTo(DateTime other) => isSameDay(date, other);
 
@@ -43,6 +47,7 @@ class ExpenseEntity {
             other.amount == amount &&
             other.currency == currency &&
             other.paymentMethod == paymentMethod &&
+            other.walletId == walletId &&
             other.date == date &&
             other.createdAt == createdAt &&
             other.updatedAt == updatedAt;
@@ -57,6 +62,7 @@ class ExpenseEntity {
     amount,
     currency,
     paymentMethod,
+    walletId,
     date,
     createdAt,
     updatedAt,

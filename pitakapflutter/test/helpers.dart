@@ -9,11 +9,18 @@ import 'package:pitakapflutter/core/providers/app_providers.dart';
 import 'package:pitakapflutter/core/providers/auth_providers.dart';
 import 'package:pitakapflutter/core/providers/expense_providers.dart';
 import 'package:pitakapflutter/core/providers/subscription_providers.dart';
+import 'package:pitakapflutter/core/providers/wallet_providers.dart';
 import 'package:pitakapflutter/core/resources/constants.dart';
 import 'package:pitakapflutter/core/resources/keys.dart';
 import 'package:pitakapflutter/core/router/app_router.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/feature/auth/domain/entities/user_details_entity.dart';
+import 'package:pitakapflutter/feature/wallet/domain/entities/wallet_entity.dart';
+import 'package:pitakapflutter/feature/wallet/domain/repository/wallet_repository.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/create_wallet_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/delete_wallet_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/restore_wallet_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/update_wallet_usecase.dart';
 import 'package:pitakapflutter/feature/auth/domain/repository/auth_repository.dart';
 import 'package:pitakapflutter/feature/auth/domain/usecases/login_user_usecase.dart';
 import 'package:pitakapflutter/feature/auth/domain/usecases/send_password_reset_usecase.dart';
@@ -107,6 +114,11 @@ class EmptyExpenseRepository implements ExpenseRepository {
   const EmptyExpenseRepository();
 
   @override
+  Stream<List<ExpenseEntity>> watchAllExpenses(String userId) {
+    return Stream.value(const []);
+  }
+
+  @override
   Stream<List<ExpenseEntity>> watchExpensesForDay(
     WatchExpensesForDayParams params,
   ) {
@@ -133,9 +145,31 @@ class EmptyExpenseRepository implements ExpenseRepository {
   Future<void> restoreExpense(RestoreExpenseUseCaseParams params) async {}
 }
 
+class EmptyWalletRepository implements WalletRepository {
+  const EmptyWalletRepository();
+
+  @override
+  Stream<List<WalletEntity>> watchWallets(String userId) {
+    return Stream.value(const []);
+  }
+
+  @override
+  Future<void> createWallet(CreateWalletUseCaseParams params) async {}
+
+  @override
+  Future<void> updateWallet(UpdateWalletUseCaseParams params) async {}
+
+  @override
+  Future<void> deleteWallet(DeleteWalletUseCaseParams params) async {}
+
+  @override
+  Future<void> restoreWallet(RestoreWalletUseCaseParams params) async {}
+}
+
 List<Override> featureOverrides({
   SubscriptionRepository? subscriptions,
   ExpenseRepository? expenses,
+  WalletRepository? wallets,
 }) {
   return [
     subscriptionRepositoryProvider.overrideWithValue(
@@ -143,6 +177,9 @@ List<Override> featureOverrides({
     ),
     expenseRepositoryProvider.overrideWithValue(
       expenses ?? const EmptyExpenseRepository(),
+    ),
+    walletRepositoryProvider.overrideWithValue(
+      wallets ?? const EmptyWalletRepository(),
     ),
   ];
 }
@@ -222,6 +259,7 @@ Future<ProviderContainer> pumpAppAt(
   UserDetailsEntity? userDetails = testUser,
   SubscriptionRepository? subscriptionRepository,
   ExpenseRepository? expenseRepository,
+  WalletRepository? walletRepository,
   List<Override> extraOverrides = const [],
 }) async {
   SharedPreferences.setMockInitialValues(values);
@@ -238,6 +276,7 @@ Future<ProviderContainer> pumpAppAt(
       ...featureOverrides(
         subscriptions: subscriptionRepository,
         expenses: expenseRepository,
+        wallets: walletRepository,
       ),
       ...extraOverrides,
     ],
@@ -266,4 +305,25 @@ Future<ProviderContainer> containerWithSubscriptions(
       ...featureOverrides(subscriptions: repository),
     ],
   );
+}
+
+/// Opens the navigation drawer from whichever branch page is on screen.
+///
+/// Every branch page owns its own Scaffold and attaches its own [AppDrawer],
+/// so the menu button belongs to that page's AppBar rather than to the shell.
+Future<void> openDrawer(WidgetTester tester) async {
+  await tester.tap(find.byIcon(Icons.menu).first);
+  await tester.pumpAndSettle();
+}
+
+/// Taps a destination by its label, scoped to the open drawer so labels that
+/// also appear as page titles (Expenses, Stats, ...) stay unambiguous.
+Future<void> tapDrawerDestination(WidgetTester tester, String label) async {
+  await tester.tap(
+    find.descendant(
+      of: find.byType(NavigationDrawer),
+      matching: find.text(label),
+    ),
+  );
+  await tester.pumpAndSettle();
 }

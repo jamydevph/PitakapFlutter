@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:pitakapflutter/core/error/failure.dart';
+import 'package:pitakapflutter/core/resources/strings.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
 import 'package:pitakapflutter/core/utils/date_utils.dart';
 import 'package:pitakapflutter/feature/expense/domain/entities/expense_entity.dart';
@@ -15,6 +16,12 @@ import 'package:pitakapflutter/feature/expense/domain/usecases/update_expense_us
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_day_usecase.dart';
 import 'package:pitakapflutter/feature/expense/domain/usecases/watch_expenses_for_month_usecase.dart';
 import 'package:pitakapflutter/feature/expense/presentation/providers/selected_day_controller.dart';
+import 'package:pitakapflutter/feature/wallet/domain/entities/wallet_entity.dart';
+import 'package:pitakapflutter/feature/wallet/domain/repository/wallet_repository.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/create_wallet_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/delete_wallet_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/restore_wallet_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/update_wallet_usecase.dart';
 
 import 'helpers.dart';
 
@@ -28,6 +35,11 @@ class RecordingExpenseRepository implements ExpenseRepository {
   Completer<void>? gate;
 
   RecordingExpenseRepository({this.forToday = const [], this.createError});
+
+  @override
+  Stream<List<ExpenseEntity>> watchAllExpenses(String userId) {
+    return Stream.value(const []);
+  }
 
   @override
   Stream<List<ExpenseEntity>> watchExpensesForDay(
@@ -62,6 +74,28 @@ class RecordingExpenseRepository implements ExpenseRepository {
   Future<void> restoreExpense(RestoreExpenseUseCaseParams params) async {}
 }
 
+class StubWalletRepository implements WalletRepository {
+  final List<WalletEntity> wallets;
+
+  const StubWalletRepository(this.wallets);
+
+  @override
+  Stream<List<WalletEntity>> watchWallets(String userId) =>
+      Stream.value(wallets);
+
+  @override
+  Future<void> createWallet(CreateWalletUseCaseParams params) async {}
+
+  @override
+  Future<void> updateWallet(UpdateWalletUseCaseParams params) async {}
+
+  @override
+  Future<void> deleteWallet(DeleteWalletUseCaseParams params) async {}
+
+  @override
+  Future<void> restoreWallet(RestoreWalletUseCaseParams params) async {}
+}
+
 ExpenseEntity expense({
   required DateTime date,
   String id = 'e1',
@@ -69,6 +103,7 @@ ExpenseEntity expense({
   String category = 'food',
   double amount = 250,
   String paymentMethod = 'cash',
+  String walletId = '',
   DateTime? createdAt,
 }) {
   return ExpenseEntity(
@@ -78,6 +113,7 @@ ExpenseEntity expense({
     category: category,
     amount: amount,
     paymentMethod: paymentMethod,
+    walletId: walletId,
     date: date,
     createdAt: createdAt,
   );
@@ -456,6 +492,140 @@ void main() {
       expect(saved.createdAt, createdAt);
       expect(saved.description, 'Dinner at Jollibee');
       expect(saved.amount, 250);
+    });
+
+    testWidgets('editing an expense keeps the wallet it was charged to', (
+      tester,
+    ) async {
+      // Regression: the update path rebuilt the entity without walletId, and
+      // because walletId is a writable field that empty string was persisted
+      // over the real assignment. Editing an amount silently unassigned the
+      // expense from its wallet and inflated that wallet's balance.
+      final repository = RecordingExpenseRepository(
+        forToday: [expense(date: today, walletId: 'w1')],
+      );
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.expenses,
+        signedInUid: 'uid-1',
+        expenseRepository: repository,
+      );
+
+      await tester.tap(find.text('Lunch at Jollibee'));
+      await tester.pumpAndSettle();
+
+      await fillDescription(tester, 'Dinner at Jollibee');
+      await tester.tap(find.text('Save expense'));
+      await tester.pumpAndSettle();
+
+      expect(repository.updated.single.walletId, 'w1');
+    });
+  });
+
+  group('wallet assignment', () {
+    const mainWallet = WalletEntity(
+      id: 'w1',
+      userId: 'uid-1',
+      name: 'Main Wallet',
+      openingBalance: 1000,
+    );
+
+    Future<RecordingExpenseRepository> openForm(
+      WidgetTester tester, {
+      List<ExpenseEntity> existing = const [],
+    }) async {
+      sizeViewport(tester);
+
+      final repository = RecordingExpenseRepository(forToday: existing);
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.expenseNew,
+        signedInUid: 'uid-1',
+        expenseRepository: repository,
+        walletRepository: const StubWalletRepository([mainWallet]),
+      );
+
+      await tester.scrollUntilVisible(
+        find.text(Strings.expenseWalletLabel),
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
+      await tester.pumpAndSettle();
+
+      return repository;
+    }
+
+    testWidgets('the form offers each wallet plus an unassigned option', (
+      tester,
+    ) async {
+      await openForm(tester);
+
+      expect(find.text(Strings.expenseWalletLabel), findsOneWidget);
+      expect(find.text(Strings.expenseWalletNone), findsOneWidget);
+      expect(find.text('Main Wallet'), findsOneWidget);
+    });
+
+    testWidgets('choosing a wallet sends its id through on create', (
+      tester,
+    ) async {
+      final repository = await openForm(tester);
+
+      await fillAmount(tester, '250');
+      await fillDescription(tester, 'Lunch at Jollibee');
+      await tester.tap(find.text('Main Wallet'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Save expense'));
+      await tester.pumpAndSettle();
+
+      expect(repository.created.single.walletId, 'w1');
+    });
+
+    testWidgets('an expense with no wallet saves with an empty walletId', (
+      tester,
+    ) async {
+      final repository = await openForm(tester);
+
+      await fillAmount(tester, '250');
+      await fillDescription(tester, 'Lunch at Jollibee');
+
+      await tester.tap(find.text('Save expense'));
+      await tester.pumpAndSettle();
+
+      expect(repository.created.single.walletId, isEmpty);
+    });
+
+    testWidgets('a wallet may not be overdrawn', (tester) async {
+      final repository = await openForm(tester);
+
+      await fillAmount(tester, '2000');
+      await fillDescription(tester, 'Too expensive');
+      await tester.tap(find.text('Main Wallet'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Save expense'));
+      await tester.pumpAndSettle();
+
+      expect(find.text(Strings.expenseWalletInsufficient), findsOneWidget);
+      expect(repository.created, isEmpty);
+    });
+
+    testWidgets('spending the balance down to exactly zero is allowed', (
+      tester,
+    ) async {
+      final repository = await openForm(tester);
+
+      await fillAmount(tester, '1000');
+      await fillDescription(tester, 'Exactly enough');
+      await tester.tap(find.text('Main Wallet'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Save expense'));
+      await tester.pumpAndSettle();
+
+      expect(repository.created, hasLength(1));
     });
   });
 

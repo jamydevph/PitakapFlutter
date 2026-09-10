@@ -14,6 +14,11 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
   const ExpenseRepositoryImpl(this.remote);
 
   @override
+  Stream<List<ExpenseEntity>> watchAllExpenses(String userId) {
+    return remote.watchAllExpenses(userId);
+  }
+
+  @override
   Stream<List<ExpenseEntity>> watchExpensesForDay(
     WatchExpensesForDayParams params,
   ) {

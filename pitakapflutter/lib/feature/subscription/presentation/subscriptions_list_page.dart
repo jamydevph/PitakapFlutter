@@ -6,6 +6,7 @@ import 'package:pitakapflutter/core/error/failure.dart';
 import 'package:pitakapflutter/core/providers/auth_providers.dart';
 import 'package:pitakapflutter/core/providers/subscription_providers.dart';
 import 'package:pitakapflutter/core/resources/strings.dart';
+import 'package:pitakapflutter/core/router/app_drawer.dart';
 import 'package:pitakapflutter/core/router/app_routes.dart';
 import 'package:pitakapflutter/core/theme/app_theme.dart';
 import 'package:pitakapflutter/feature/subscription/domain/entities/subscription_entity.dart';
@@ -73,6 +74,7 @@ class SubscriptionsListPage extends ConsumerWidget {
     final controller = ref.read(subscriptionListFilterProvider.notifier);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text(Strings.subscriptionsTitle),
         actions: [
