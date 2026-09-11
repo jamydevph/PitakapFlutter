@@ -21,6 +21,12 @@ import 'package:pitakapflutter/feature/subscription/domain/usecases/create_subsc
 import 'package:pitakapflutter/feature/subscription/domain/usecases/delete_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/restore_subscription_usecase.dart';
 import 'package:pitakapflutter/feature/subscription/domain/usecases/update_subscription_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/entities/wallet_entity.dart';
+import 'package:pitakapflutter/feature/wallet/domain/repository/wallet_repository.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/create_wallet_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/delete_wallet_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/restore_wallet_usecase.dart';
+import 'package:pitakapflutter/feature/wallet/domain/usecases/update_wallet_usecase.dart';
 
 import 'helpers.dart';
 
@@ -50,6 +56,27 @@ class StubSubscriptionRepository implements SubscriptionRepository {
 
   @override
   Future<void> rescheduleAllReminders(String userId) async {}
+}
+
+class StubWalletRepository implements WalletRepository {
+  final List<WalletEntity> items;
+
+  const StubWalletRepository({this.items = const []});
+
+  @override
+  Stream<List<WalletEntity>> watchWallets(String userId) => Stream.value(items);
+
+  @override
+  Future<void> createWallet(CreateWalletUseCaseParams p) async {}
+
+  @override
+  Future<void> updateWallet(UpdateWalletUseCaseParams p) async {}
+
+  @override
+  Future<void> deleteWallet(DeleteWalletUseCaseParams p) async {}
+
+  @override
+  Future<void> restoreWallet(RestoreWalletUseCaseParams p) async {}
 }
 
 class StubExpenseRepository implements ExpenseRepository {
@@ -128,7 +155,10 @@ void main() {
 
   group('greetingFor', () {
     test('is time of day, not a fixed string', () {
-      expect(DashboardPage.greetingFor(DateTime(2026, 8, 20, 0)), 'Good morning,');
+      expect(
+        DashboardPage.greetingFor(DateTime(2026, 8, 20, 0)),
+        'Good morning,',
+      );
       expect(
         DashboardPage.greetingFor(DateTime(2026, 8, 20, 11, 59)),
         'Good morning,',
@@ -165,7 +195,10 @@ void main() {
       );
 
       expect(find.text('Diane'), findsOneWidget);
-      expect(find.text(DashboardPage.greetingFor(DateTime.now())), findsOneWidget);
+      expect(
+        find.text(DashboardPage.greetingFor(DateTime.now())),
+        findsOneWidget,
+      );
     });
 
     testWidgets('survives a missing userDetails document', (tester) async {
@@ -276,6 +309,50 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Subscriptions'), findsWidgets);
+    });
+
+    testWidgets('the spent today card opens the expenses tab', (tester) async {
+      sizeViewport(tester);
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.dashboard,
+        signedInUid: 'uid-1',
+        subscriptionRepository: const StubSubscriptionRepository(),
+        expenseRepository: const StubExpenseRepository(),
+      );
+
+      await tester.tap(find.text('SPENT TODAY'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Expenses'), findsWidgets);
+    });
+
+    testWidgets('the total balance card opens the wallets tab', (tester) async {
+      sizeViewport(tester);
+
+      await pumpAppAt(
+        tester,
+        AppRoutes.dashboard,
+        signedInUid: 'uid-1',
+        subscriptionRepository: const StubSubscriptionRepository(),
+        expenseRepository: const StubExpenseRepository(),
+        walletRepository: const StubWalletRepository(
+          items: [
+            WalletEntity(
+              id: 'w-1',
+              userId: 'uid-1',
+              name: 'Main',
+              openingBalance: 1000,
+            ),
+          ],
+        ),
+      );
+
+      await tester.tap(find.text('TOTAL BALANCE'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Wallets'), findsWidgets);
     });
 
     testWidgets('surfaces a load failure without leaking internals', (

@@ -184,49 +184,63 @@ class _SpentTodayCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colorScheme.primary,
+    return Material(
+      color: colorScheme.primary,
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      child: InkWell(
+        onTap: () => context.go(AppRoutes.expenses),
         borderRadius: BorderRadius.circular(AppRadius.card),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    Strings.spentTodayLabel,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onPrimary,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        DateFormat('EEE, MMM d').format(now),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Icon(
+                        Icons.chevron_right,
+                        size: 16,
+                        color: colorScheme.onPrimary,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
               Text(
-                Strings.spentTodayLabel,
-                style: theme.textTheme.labelSmall?.copyWith(
+                formatCurrency(summary.spentToday),
+                style: theme.textTheme.displaySmall?.copyWith(
                   color: colorScheme.onPrimary,
-                  letterSpacing: 1,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
+              const SizedBox(height: AppSpacing.sm),
               Text(
-                DateFormat('EEE, MMM d').format(now),
-                style: theme.textTheme.labelSmall?.copyWith(
+                '${summary.activeSubscriptionCount} ${Strings.activeSuffix}',
+                style: theme.textTheme.bodySmall?.copyWith(
                   color: colorScheme.onPrimary,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            formatCurrency(summary.spentToday),
-            style: theme.textTheme.displaySmall?.copyWith(
-              color: colorScheme.onPrimary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            '${summary.activeSubscriptionCount} ${Strings.activeSuffix}',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onPrimary,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -278,61 +292,75 @@ class _TotalBalanceCard extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: colorScheme.primaryContainer,
+      child: Material(
+        color: colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        child: InkWell(
+          onTap: () => context.go(AppRoutes.wallets),
           borderRadius: BorderRadius.circular(AppRadius.card),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(
-                      Icons.account_balance_wallet_outlined,
-                      size: 16,
-                      color: colorScheme.onPrimaryContainer,
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.account_balance_wallet_outlined,
+                          size: 16,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          Strings.totalBalanceLabel,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onPrimaryContainer,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      Strings.totalBalanceLabel,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colorScheme.onPrimaryContainer,
-                        letterSpacing: 1,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          walletCountLabel(wallets.length),
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Icon(
+                          Icons.chevron_right,
+                          size: 16,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                      ],
                     ),
                   ],
                 ),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
-                  walletCountLabel(wallets.length),
-                  style: theme.textTheme.labelSmall?.copyWith(
+                  formatCurrency(total, currencyCode: wallets.first.currency),
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    color: colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  breakdownOf(wallets, balances),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onPrimaryContainer,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              formatCurrency(total, currencyCode: wallets.first.currency),
-              style: theme.textTheme.displaySmall?.copyWith(
-                color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              breakdownOf(wallets, balances),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.onPrimaryContainer,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
